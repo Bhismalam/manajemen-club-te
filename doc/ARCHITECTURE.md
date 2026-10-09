@@ -215,7 +215,25 @@ Plugin:
 
 - `twoFactor`: TOTP + backup/recovery codes.
 - `admin`: role, ban/suspend user, impersonation dimatikan.
-- `passkey`: Phase 2.
+- `passkey`: Phase 2 (post-MVP).
+- `nextCookies`: meneruskan cookie dari `auth.api` di Server Action.
+
+File:
+
+- `src/lib/auth/auth.ts`: konfigurasi server (hanya server).
+- `src/lib/auth/auth-client.ts`: client untuk komponen `"use client"` (`signIn`, `signOut`, `requestPasswordReset`, `resetPassword`).
+- `src/lib/auth/session.ts`: Data Access Layer (`getCurrentUser`, `requireUser`, `requireRole`).
+- `src/lib/auth/routes.ts`: path login/dashboard per role dan `safeCallbackUrl` (anti open redirect).
+- `src/proxy.ts`: pengecekan optimistis keberadaan cookie session untuk `/admin`, `/coach`, `/athlete`, `/settings`, `/dashboard`.
+- `src/app/dashboard/route.ts`: setelah login, redirect ke dashboard sesuai role.
+
+Aturan baca session (Next.js 16 + `cacheComponents`):
+
+- Session dibaca di komponen di dalam `<Suspense>`, jangan di-await di level atas layout.
+- `getCurrentUser` hanya di-dedupe per request (`React.cache`), **tidak** memakai `use cache: private`, supaya ban/perubahan role langsung berlaku.
+- Setiap page, Server Action, dan Route Handler memanggil guard sendiri. `proxy.ts` bukan pengaman utama.
+
+Akun nonaktif ditolak di dua lapis: `banned` (plugin admin) saat sign-in, dan hook `session.create.before` yang mengecek `status`/`deletedAt`. `getCurrentUser` juga mengembalikan `null` untuk session milik akun yang sudah dinonaktifkan.
 
 Session minimal membawa:
 

@@ -48,16 +48,17 @@ Gunakan:
 
 ## PHASE 2 — Authentication
 
-- [ ] Setup Better Auth (Prisma adapter, `/api/auth/[...all]`).
-- [ ] Login page.
-- [ ] Logout.
-- [ ] Session.
-- [ ] Protected routes.
-- [ ] Role redirect.
-- [ ] Forgot password.
-- [ ] Reset password.
-- [ ] Disabled user handling.
-- [ ] Rate limit login & reset password.
+- [x] Setup Better Auth (Prisma adapter, `/api/auth/[...all]`).
+- [x] Login page (`/login`).
+- [x] Logout.
+- [x] Session (DAL `src/lib/auth/session.ts`: `getCurrentUser`, `requireUser`, `requireRole`).
+- [x] Protected routes (`src/proxy.ts` cek cookie + guard server per halaman).
+- [x] Role redirect (`/dashboard` → dashboard sesuai role; role lain diarahkan ke dashboard sendiri).
+- [x] Forgot password (`/forgot-password`, respons sama untuk email terdaftar/tidak).
+- [x] Reset password (`/reset-password`, token 30 menit sekali pakai, semua sesi dicabut).
+- [x] Disabled user handling (`banned` + hook `status`/`deletedAt`, session lama langsung tidak berlaku).
+- [x] Rate limit login & reset password (storage database; login 5/menit, reset 3/5 menit).
+- [ ] Pilih & pasang email provider production (mis. Resend). Saat ini `sendEmail` hanya log di development dan melempar error di production.
 
 ## PHASE 2b — MFA
 
@@ -233,7 +234,9 @@ Gunakan:
 - [ ] Server-side validation.
 - [ ] RBAC test.
 - [ ] IDOR test.
-- [ ] Rate limiting.
+- [ ] Rate limiting (endpoint non-auth: pendaftaran event, export, contact form).
+- [ ] Pastikan IP klien terbaca benar di Vercel (`x-forwarded-for`), karena rate limit auth berbasis IP.
+- [ ] Evaluasi token session di body respons sign-in Better Auth (cookie tetap HttpOnly; mitigasi utama: CSP + cegah XSS).
 - [ ] Secure headers.
 - [ ] Upload validation.
 - [ ] Error sanitization.
@@ -257,7 +260,7 @@ Gunakan:
 
 - [ ] Setup production DB.
 - [ ] Setup Vercel.
-- [ ] Environment variables.
+- [ ] Environment variables (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, email provider).
 - [ ] Migration production.
 - [ ] Seed admin (wajib setup MFA saat login pertama).
 - [ ] Setup bucket storage privat untuk PDF event.

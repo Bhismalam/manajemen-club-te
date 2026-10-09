@@ -210,6 +210,16 @@ model TwoFactor {
   @@map("two_factor")
 }
 
+// Storage rate limit Better Auth (dipakai bersama oleh semua instance serverless).
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+
+  @@map("rate_limit")
+}
+
 // ============================================================================
 // Profiles & training
 // ============================================================================
