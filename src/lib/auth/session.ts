@@ -6,7 +6,7 @@ import { cache } from "react";
 
 import type { UserRole } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth/auth";
-import { dashboardPathFor, LOGIN_PATH } from "@/lib/auth/routes";
+import { dashboardPathFor, LOGIN_PATH, MFA_SETUP_PATH } from "@/lib/auth/routes";
 
 export type CurrentUser = {
   id: string;
@@ -44,5 +44,13 @@ export async function requireUser(): Promise<CurrentUser> {
 export async function requireRole(...roles: UserRole[]): Promise<CurrentUser> {
   const user = await requireUser();
   if (!roles.includes(user.role)) redirect(dashboardPathFor(user.role));
+  return user;
+}
+
+// Semua page / Server Action admin wajib memakai ini (bukan requireRole("ADMIN")):
+// admin yang belum mengaktifkan MFA diarahkan ke halaman setup MFA.
+export async function requireAdmin(): Promise<CurrentUser> {
+  const user = await requireRole("ADMIN");
+  if (!user.twoFactorEnabled) redirect(MFA_SETUP_PATH);
   return user;
 }

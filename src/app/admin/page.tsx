@@ -5,7 +5,7 @@ import {
   DashboardPlaceholder,
   DashboardSkeleton,
 } from "@/components/dashboard/dashboard-placeholder";
-import { requireRole } from "@/lib/auth/session";
+import { requireAdmin } from "@/lib/auth/session";
 
 export const metadata: Metadata = { title: "Dashboard Admin" };
 
@@ -18,6 +18,6 @@ export default function AdminPage() {
 }
 
 async function AdminHome() {
-  const user = await requireRole("ADMIN");
+  const user = await requireAdmin();
   return <DashboardPlaceholder title="Dashboard Admin" user={user} />;
 }

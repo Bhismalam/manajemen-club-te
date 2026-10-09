@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth/auth-client";
-import { DASHBOARD_PATH, safeCallbackUrl } from "@/lib/auth/routes";
+import { DASHBOARD_PATH, safeCallbackUrl, TWO_FACTOR_PATH } from "@/lib/auth/routes";
 import type { LoginInput } from "@/lib/validations/auth";
 import { loginSchema } from "@/lib/validations/auth";
 
@@ -42,7 +42,7 @@ export function LoginForm() {
 
     const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl")) ?? DASHBOARD_PATH;
     if (data && "twoFactorRedirect" in data && data.twoFactorRedirect) {
-      router.push(`/login/two-factor?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+      router.push(`${TWO_FACTOR_PATH}?callbackUrl=${encodeURIComponent(callbackUrl)}`);
       return;
     }
 

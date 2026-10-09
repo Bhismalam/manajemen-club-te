@@ -45,7 +45,8 @@ Deployment:
 - `pnpm dev`: development server.
 - `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, atau sekaligus `pnpm check`.
 - `pnpm build`: production build.
-- `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:studio`.
+- `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:seed`, `pnpm db:reset`, `pnpm db:studio`.
+- `pnpm mfa:reset --email <email> --reason "..." --yes`: reset MFA darurat dari server.
 
 ## 2. Coding Principles
 
@@ -190,6 +191,14 @@ Setiap protected operation harus memeriksa:
 4. Resource permission.
 
 Jangan hanya menyembunyikan button di frontend.
+
+Guard yang tersedia di `src/lib/auth/session.ts`:
+
+- `requireUser()`: semua halaman/aksi yang butuh login.
+- `requireRole("COACH" | "ATHLETE", ...)`: area pelatih/atlet.
+- `requireAdmin()`: **wajib** untuk semua page, Server Action, dan Route Handler admin (termasuk cek MFA). Jangan pakai `requireRole("ADMIN")` untuk area admin.
+
+Panggil guard di dalam komponen yang dibungkus `<Suspense>` (aturan `cacheComponents`), bukan di level atas layout.
 
 ## 7. Database Rules
 

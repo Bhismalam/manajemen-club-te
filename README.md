@@ -25,14 +25,15 @@ Buka http://localhost:3000.
 
 ## Perintah
 
-| Perintah           | Fungsi                            |
-| ------------------ | --------------------------------- |
-| `pnpm dev`         | Development server                |
-| `pnpm build`       | Production build                  |
-| `pnpm check`       | Lint + typecheck + cek format     |
-| `pnpm format`      | Format semua file dengan Prettier |
-| `pnpm db:migrate`  | Buat & jalankan migration (dev)   |
-| `pnpm db:seed`     | Isi data demo (development)       |
-| `pnpm db:reset`    | Hapus DB lokal, migrate, dan seed |
-| `pnpm db:generate` | Generate ulang Prisma Client      |
-| `pnpm db:studio`   | Buka Prisma Studio                |
+| Perintah           | Fungsi                                         |
+| ------------------ | ---------------------------------------------- |
+| `pnpm dev`         | Development server                             |
+| `pnpm build`       | Production build                               |
+| `pnpm check`       | Lint + typecheck + cek format                  |
+| `pnpm format`      | Format semua file dengan Prettier              |
+| `pnpm db:migrate`  | Buat & jalankan migration (dev)                |
+| `pnpm db:seed`     | Isi data demo (development)                    |
+| `pnpm db:reset`    | Hapus DB lokal, migrate, dan seed              |
+| `pnpm db:generate` | Generate ulang Prisma Client                   |
+| `pnpm db:studio`   | Buka Prisma Studio                             |
+| `pnpm mfa:reset`   | Reset MFA darurat (lihat doc/SECURITY.md §2.1) |

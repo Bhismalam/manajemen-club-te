@@ -2,6 +2,9 @@ import type { UserRole } from "@/generated/prisma/enums";
 
 export const LOGIN_PATH = "/login";
 export const DASHBOARD_PATH = "/dashboard";
+export const TWO_FACTOR_PATH = "/login/two-factor";
+export const SECURITY_SETTINGS_PATH = "/settings/security";
+export const MFA_SETUP_PATH = "/settings/security/mfa-setup";
 
 const ROLE_HOME: Record<UserRole, string> = {
   ADMIN: "/admin",

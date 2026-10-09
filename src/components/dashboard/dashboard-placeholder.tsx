@@ -1,4 +1,8 @@
+import Link from "next/link";
+
+import { buttonVariants } from "@/components/ui/button";
 import { LogoutButton } from "@/features/auth/logout-button";
+import { SECURITY_SETTINGS_PATH } from "@/lib/auth/routes";
 import type { CurrentUser } from "@/lib/auth/session";
 
 // Sementara sampai app shell dashboard dibuat di Phase 4.
@@ -12,7 +16,12 @@ export function DashboardPlaceholder({ title, user }: { title: string; user: Cur
             Masuk sebagai {user.name} ({user.email})
           </p>
         </div>
-        <LogoutButton />
+        <div className="flex gap-2">
+          <Link href={SECURITY_SETTINGS_PATH} className={buttonVariants({ variant: "ghost" })}>
+            Keamanan akun
+          </Link>
+          <LogoutButton />
+        </div>
       </header>
       <p className="text-sm text-muted-foreground">Konten dashboard menyusul di fase berikutnya.</p>
     </main>

@@ -62,17 +62,17 @@ Gunakan:
 
 ## PHASE 2b — MFA
 
-- [ ] Aktifkan plugin `twoFactor` (TOTP + backup codes).
-- [ ] Halaman `/login/two-factor` (OtpInput + recovery code).
-- [ ] Halaman `/settings/security` (aktif/nonaktif MFA, regenerate recovery codes).
-- [ ] Halaman `/settings/security/mfa-setup` (QR, verifikasi, recovery codes).
-- [ ] Guard `requireAdmin()` wajib MFA untuk semua page/action/route admin.
-- [ ] Paksa admin baru / seed admin setup MFA saat login pertama.
-- [ ] Trust device 30 hari untuk coach/atlet, dimatikan untuk admin.
-- [ ] Admin reset MFA user lain (+ audit log).
-- [ ] Script CLI pemulihan admin terakhir.
-- [ ] Rate limit verifikasi TOTP.
-- [ ] Test: admin tanpa MFA ditolak, recovery code sekali pakai, brute force TOTP.
+- [x] Aktifkan plugin `twoFactor` (TOTP + backup codes).
+- [x] Halaman `/login/two-factor` (OtpInput + recovery code).
+- [x] Halaman `/settings/security` (aktif/nonaktif MFA, regenerate recovery codes).
+- [x] Halaman `/settings/security/mfa-setup` (QR, verifikasi, recovery codes).
+- [x] Guard `requireAdmin()` wajib MFA untuk semua page/action/route admin.
+- [x] Paksa admin baru / seed admin setup MFA saat login pertama.
+- [x] Trust device 30 hari untuk coach/atlet, dimatikan untuk admin (ditegakkan di server).
+- [x] Admin reset MFA user lain (+ audit log): server action `resetUserMfaAction`. Tombol UI menyusul di Phase 5.
+- [x] Script CLI pemulihan admin terakhir (`pnpm mfa:reset`).
+- [x] Rate limit verifikasi TOTP (+ batas 5 percobaan per sesi & penguncian akun bawaan).
+- [x] Test: admin tanpa MFA ditolak, recovery code sekali pakai, brute force TOTP.
 
 ## PHASE 3 — Authorization
 
@@ -100,7 +100,9 @@ Gunakan:
 - [ ] User list.
 - [ ] Create user.
 - [ ] Edit user.
-- [ ] Activate/deactivate user.
+- [ ] Activate/deactivate user (set `status` + `banned` bersamaan).
+- [ ] Tombol reset MFA di detail user (pakai `resetUserMfaAction`).
+- [ ] Saat role diubah menjadi ADMIN: panggil `revokeTrustedDevices()`.
 - [ ] Athlete list.
 - [ ] Athlete detail.
 - [ ] Coach list.
@@ -237,6 +239,7 @@ Gunakan:
 - [ ] Rate limiting (endpoint non-auth: pendaftaran event, export, contact form).
 - [ ] Pastikan IP klien terbaca benar di Vercel (`x-forwarded-for`), karena rate limit auth berbasis IP.
 - [ ] Evaluasi token session di body respons sign-in Better Auth (cookie tetap HttpOnly; mitigasi utama: CSP + cegah XSS).
+- [ ] Cek apakah kode TOTP bisa dipakai ulang dalam window 30 detik; jika ya, tambahkan pencegahan replay.
 - [ ] Secure headers.
 - [ ] Upload validation.
 - [ ] Error sanitization.

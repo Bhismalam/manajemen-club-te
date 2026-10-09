@@ -34,7 +34,7 @@ Metode:
 - **TOTP** (RFC 6238) melalui aplikasi authenticator: Google Authenticator, Microsoft Authenticator, Authy, 1Password, dll.
 - **Recovery codes**: 10 kode sekali pakai, ditampilkan sekali saat setup, disimpan terenkripsi.
 - Tidak memakai SMS/WhatsApp OTP: ada biaya per pesan, rawan SIM-swap, dan pengirimannya tidak selalu andal.
-- Passkey (WebAuthn): Phase 2.
+- Passkey (WebAuthn): post-MVP.
 
 Kebijakan per role:
 
@@ -49,6 +49,8 @@ Enforcement admin:
 - Admin dengan `twoFactorEnabled = false` hanya boleh mengakses `/settings/security/mfa-setup` dan logout.
 - Dicek di guard server-side `requireAdmin()` pada setiap page, server action, dan route handler admin. `proxy.ts` (pengganti middleware di Next.js 16) hanya lapisan tambahan, bukan satu-satunya.
 - Akun admin baru (termasuk seed admin) wajib setup MFA pada login pertama.
+- "Percayai perangkat ini" untuk admin diabaikan di server (`hooks.before` di `src/lib/auth/auth.ts` memaksa `trustDevice = false`), bukan hanya disembunyikan di UI.
+- Saat user dipromosikan menjadi ADMIN, panggil `revokeTrustedDevices()` (`src/services/mfa-service.ts`) agar perangkat tepercaya lamanya tidak bisa melewati MFA.
 
 Setup MFA:
 
@@ -59,20 +61,28 @@ Setup MFA:
 
 Menonaktifkan MFA:
 
-- Wajib password + kode TOTP yang valid.
-- Admin tidak bisa menonaktifkan MFA miliknya sendiri.
+- Wajib password akun (bawaan Better Auth).
+- Admin tidak bisa menonaktifkan MFA miliknya sendiri (ditolak server dengan kode `ADMIN_MFA_REQUIRED`).
 
 Kehilangan perangkat:
 
 - User memakai recovery code, lalu setup ulang MFA.
-- Jika recovery code juga hilang: admin lain dapat **reset MFA** user tersebut. User wajib setup ulang pada login berikutnya, dan tindakan ini dicatat di audit log.
-- Jika yang terkunci adalah admin terakhir: pemulihan lewat script CLI server oleh pemilik sistem (terdokumentasi, bukan endpoint publik).
+- Jika recovery code juga hilang: admin lain dapat **reset MFA** user tersebut (`resetUserMfaAction` di `src/features/users/mfa-actions.ts`; tombolnya dipasang di halaman detail user, Phase 5). Admin tidak bisa mereset MFA miliknya sendiri. Reset menghapus secret & recovery code, mencabut semua session dan perangkat tepercaya, dan dicatat di audit log.
+- Jika yang terkunci adalah admin terakhir: pemulihan lewat script CLI di server oleh pemilik sistem (bukan endpoint publik):
+
+  ```bash
+  pnpm mfa:reset --email admin@club.local --reason "HP hilang" --yes
+  ```
+
+  Tanpa `--yes` script hanya menampilkan target (dry run). Audit log mencatat actor = sistem.
 
 Perlindungan:
 
-- Rate limit verifikasi TOTP (mis. 5 percobaan / 5 menit per user).
-- Kode TOTP tidak boleh dipakai ulang dalam window yang sama.
-- Setiap MFA enabled / disabled / reset / gagal berulang dicatat di audit log.
+- Per sesi login: maksimal 5 kode salah, setelah itu sesi verifikasi dibatalkan dan user harus login ulang (bawaan Better Auth).
+- Per akun: kegagalan dihitung di `two_factor.failedVerificationCount`; akun dikunci sementara (`lockedUntil`) jika gagal terus.
+- Rate limit per IP untuk semua endpoint `/two-factor/*`: 10 request / 5 menit (longgar karena alur setup memakai beberapa endpoint).
+- Audit log: `mfa.enabled`, `mfa.disabled`, `mfa.backup_codes_regenerated`, `mfa.reset`. Percobaan gagal tidak dicatat per request; jejaknya ada di `failedVerificationCount`/`lockedUntil`.
+- Belum diverifikasi: apakah kode TOTP yang sama bisa dipakai dua kali dalam window 30 detik (dicatat di TASK Phase 15).
 
 ## 3. Authorization
 
