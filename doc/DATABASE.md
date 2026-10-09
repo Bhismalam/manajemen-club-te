@@ -2,17 +2,28 @@
 
 ## 1. Database
 
-PostgreSQL + Prisma ORM.
+PostgreSQL + Prisma ORM 7.
+
+**Sumber kebenaran schema adalah [`prisma/schema.prisma`](../prisma/schema.prisma)** dan folder `prisma/migrations/`. Dokumen ini menjelaskan desain dan alasannya. Jika ada perbedaan, schema yang berlaku, lalu dokumen ini diperbarui.
+
+Konvensi:
+
+- Nama model PascalCase, nama tabel snake_case (`@@map`), nama kolom camelCase.
+- Timestamp disimpan dalam UTC. Kolom tanggal saja (tanggal lahir, tanggal event) memakai `@db.Date`.
+- CHECK constraint yang tidak bisa ditulis di Prisma ada di migration SQL (lihat §6).
 
 ## 2. ID Strategy
 
-Gunakan CUID atau UUID untuk primary key.
+- Tabel domain: `cuid()` (default Prisma).
+- Tabel auth (User, Session, Account, Verification, TwoFactor): ID dibuat oleh Better Auth.
 
 ## 3. Core Entities
 
 ### Auth Tables (Better Auth)
 
-Autentikasi memakai **Better Auth** + Prisma adapter. Tabel `User`, `Session`, `Account`, `Verification`, dan `TwoFactor` digenerate oleh Better Auth CLI (`npx @better-auth/cli generate`), lalu diberi field tambahan sesuai kebutuhan aplikasi. Jangan membuat tabel auth paralel.
+Autentikasi memakai **Better Auth** + Prisma adapter. Field tabel `User`, `Session`, `Account`, `Verification`, dan `TwoFactor` mengikuti output Better Auth CLI (`pnpm exec auth generate`), lalu diberi field tambahan sesuai kebutuhan aplikasi. Jangan membuat tabel auth paralel.
+
+Cara memperbarui jika plugin auth berubah: generate ke file sementara (`--output`), bandingkan, lalu samakan field di `schema.prisma` secara manual. Jangan menimpa `schema.prisma` langsung, karena CLI menghasilkan `role` sebagai `String`, sedangkan kita memakai enum `UserRole`.
 
 Catatan penting:
 
@@ -27,9 +38,12 @@ name
 email
 emailVerified
 image
-role                # additional field, default ATHLETE
-status              # additional field, default ACTIVE
-twoFactorEnabled    # dari plugin twoFactor
+role                # plugin admin, enum UserRole, default ATHLETE
+banned              # plugin admin
+banReason           # plugin admin
+banExpires          # plugin admin
+twoFactorEnabled    # plugin twoFactor
+status              # additional field, enum UserStatus, default ACTIVE
 lastLoginAt
 createdAt
 updatedAt
@@ -47,6 +61,8 @@ Status:
 - ACTIVE
 - INACTIVE
 - SUSPENDED
+
+`status` adalah label domain yang tampil di UI admin. Pemblokiran login dilakukan oleh Better Auth lewat `banned`. Karena itu, saat admin menonaktifkan atau men-suspend user, service wajib mengubah keduanya sekaligus: `status` dan `banned = true` (lewat API plugin admin, yang juga mencabut session aktif). Saat diaktifkan kembali, `banned = false` dan `status = ACTIVE`.
 
 ### Session
 
@@ -91,8 +107,11 @@ updatedAt
 ```text
 id
 userId
-secret              # TOTP secret, terenkripsi
-backupCodes         # recovery codes, terenkripsi
+secret                    # TOTP secret, terenkripsi
+backupCodes               # recovery codes, terenkripsi
+verified
+failedVerificationCount   # penguncian bawaan setelah gagal berulang
+lockedUntil
 ```
 
 ### AthleteProfile
@@ -102,13 +121,14 @@ id
 userId
 athleteNumber
 fullName
-photoUrl
-birthDate
-gender
+photoKey            # object key di bucket privat, bukan URL publik
+birthDate           # @db.Date
+gender              # enum Gender: MALE, FEMALE
 phone
-joinDate
+joinDate            # @db.Date
 trainingGroupId
 isActive
+deletedAt
 createdAt
 updatedAt
 ```
@@ -119,10 +139,11 @@ updatedAt
 id
 userId
 fullName
-photoUrl
+photoKey
 phone
 specialization
 isActive
+deletedAt
 createdAt
 updatedAt
 ```
@@ -144,12 +165,11 @@ updatedAt
 id
 trainingGroupId
 title
-date
-startTime
-endTime
+startsAt            # timestamp UTC (tanggal + jam mulai)
+endsAt              # timestamp UTC, harus > startsAt
 location
 notes
-createdBy
+createdById
 createdAt
 updatedAt
 ```
@@ -162,10 +182,12 @@ trainingSessionId
 athleteId
 status
 note
-recordedBy
+recordedById
 createdAt
 updatedAt
 ```
+
+Unique: `trainingSessionId + athleteId`.
 
 AttendanceStatus:
 
@@ -184,12 +206,14 @@ code
 name
 sportType
 distanceMeter
-style
-poolLength
+style               # FREESTYLE, BACKSTROKE, SURFACE, BIFINS, APNEA, ...
+poolLength          # 25 (short course) atau 50 (long course)
 isActive
 createdAt
 updatedAt
 ```
+
+Nomor yang sama di kolom berbeda dianggap discipline berbeda (PB-nya terpisah). Contoh code: `SW-50FR-LC`, `FS-100SF-LC`.
 
 SportType:
 
@@ -214,7 +238,7 @@ trainingSessionId
 durationMs
 trialDate
 note
-recordedBy
+recordedById
 createdAt
 updatedAt
 ```
@@ -248,19 +272,27 @@ id
 name
 description             # text, deskripsi event
 location
-startDate
-endDate
-level
-status
+startDate               # @db.Date
+endDate                 # @db.Date
+level                   # enum CompetitionLevel
+status                  # default DRAFT
 registrationOpensAt
 registrationClosesAt    # deadline pendaftaran
 maxEntriesPerAthlete    # nullable, batas jumlah nomor lomba per atlet
 attachmentKey           # nullable, object key PDF di storage privat
 attachmentName          # nullable, nama file untuk ditampilkan
-createdBy
+createdById
 createdAt
 updatedAt
 ```
+
+CompetitionLevel:
+
+- CLUB
+- REGIONAL
+- PROVINCIAL
+- NATIONAL
+- INTERNATIONAL
 
 CompetitionStatus:
 
@@ -334,7 +366,12 @@ updatedAt
 Unique:
 `competitionId + athleteId + disciplineId`
 
-`competitionId` dan `athleteId` disimpan ulang (denormalisasi) agar unique constraint dan query rekap sederhana. Nilainya harus sama dengan registration induknya.
+`competitionId` dan `athleteId` disimpan ulang (denormalisasi) agar unique constraint dan query rekap sederhana. Konsistensinya dijamin database lewat dua composite foreign key:
+
+- `(registrationId, competitionId, athleteId)` → `CompetitionRegistration(id, competitionId, athleteId)`: entry selalu milik event dan atlet yang sama dengan registration-nya.
+- `(competitionId, disciplineId)` → `CompetitionDiscipline(competitionId, disciplineId)`: nomor lomba harus dibuka di event tersebut.
+
+Karena kolom dipakai bersama oleh beberapa relasi, buat entry dengan scalar ID (`createMany` / unchecked input), bukan nested `connect`.
 
 ### RaceResult
 
@@ -347,10 +384,12 @@ medal
 round
 status
 note
-recordedBy
+recordedById
 createdAt
 updatedAt
 ```
+
+Unique: `competitionEntryId + round`.
 
 Medal:
 
@@ -463,17 +502,30 @@ Discipline
 
 ## 6. Critical Constraints
 
+Ditegakkan oleh database (unique, foreign key, atau CHECK di migration `init`):
+
 - Email unique.
 - Athlete number unique.
 - Satu PB per athlete + discipline.
 - Satu registration per competition + athlete.
 - Satu entry per competition + athlete + discipline.
-- `CompetitionEntry.disciplineId` harus ada di `CompetitionDiscipline` event yang sama (dicek di service).
-- Jumlah entry aktif per atlet ≤ `Competition.maxEntriesPerAthlete` jika diisi (dicek di service).
-- `registrationClosesAt` > `registrationOpensAt` dan ≤ `startDate`.
-- Race result harus terkait competition entry dari registration berstatus `REGISTERED`.
-- Duration harus > 0 jika status FINISHED.
-- Rank harus > 0 jika tersedia.
+- Satu attendance per sesi + atlet.
+- Satu race result per entry + round.
+- Entry harus sesuai registration-nya dan nomor lombanya harus dibuka di event tersebut (composite FK).
+- `distanceMeter` > 0, `poolLength` ∈ {25, 50}.
+- `durationMs` > 0 untuk time trial, PB, dan race result (jika diisi).
+- Race result berstatus `FINISHED` wajib punya `durationMs`.
+- `rank` > 0 jika diisi; `seedTimeMs` > 0 jika diisi; `maxEntriesPerAthlete` > 0 jika diisi.
+- `endsAt` > `startsAt` (sesi latihan); `endDate` ≥ `startDate` (event).
+- `registrationClosesAt` > `registrationOpensAt` dan tanggalnya ≤ `startDate`.
+- Event selain `DRAFT` wajib punya periode pendaftaran.
+- Registration berstatus `CANCELLED` jika dan hanya jika `cancelledAt` terisi.
+
+Dicek di service (butuh logika atau waktu sekarang):
+
+- Pendaftaran hanya saat event `UPCOMING` dan `now` berada di periode pendaftaran.
+- Jumlah entry per atlet ≤ `Competition.maxEntriesPerAthlete`.
+- Race result hanya untuk entry dari registration berstatus `REGISTERED`.
 
 ## 7. Indexes
 
@@ -520,67 +572,29 @@ Gunakan soft delete untuk:
 
 Jangan hard delete data performa historis tanpa proses administratif.
 
-## 10. Sample Prisma Direction
+## 10. Prisma Schema & Workflow
 
-```prisma
-enum UserRole {
-  ADMIN
-  COACH
-  ATHLETE
-}
+Schema lengkap: [`prisma/schema.prisma`](../prisma/schema.prisma).
 
-enum SportType {
-  SWIMMING
-  FINSWIMMING
-}
+Alur perubahan schema:
 
-enum UserStatus {
-  ACTIVE
-  INACTIVE
-  SUSPENDED
-}
+1. Ubah `schema.prisma`.
+2. `pnpm db:migrate --name <nama>`. Jika butuh SQL tambahan (CHECK, index khusus), pakai `--create-only`, edit `migration.sql`, lalu jalankan `pnpm db:migrate` lagi.
+3. `pnpm db:generate` (Prisma 7 tidak lagi generate otomatis setelah migrate).
 
-enum RegistrationStatus {
-  REGISTERED
-  CANCELLED
-}
+## 10.1 Seed (development)
 
-// Field inti digenerate oleh Better Auth CLI; role/status adalah additional fields.
-model User {
-  id               String     @id
-  name             String
-  email            String     @unique
-  emailVerified    Boolean    @default(false)
-  role             UserRole   @default(ATHLETE)
-  status           UserStatus @default(ACTIVE)
-  twoFactorEnabled Boolean    @default(false)
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  deletedAt        DateTime?
-}
+`pnpm db:seed` (juga dijalankan otomatis oleh `pnpm db:reset`). Isinya:
 
-model CompetitionRegistration {
-  id                 String             @id @default(cuid())
-  competitionId      String
-  athleteId          String
-  registeredByUserId String
-  status             RegistrationStatus @default(REGISTERED)
-  note               String?
-  cancelledAt        DateTime?
-  cancelledByUserId  String?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+- 19 discipline (renang + finswimming, kolam 50m).
+- 1 admin, 2 pelatih, 4 atlet, 2 training group. Password semua akun = `SEED_PASSWORD` di `.env.local`.
+- Data demo: 1 sesi latihan + absensi, time trial + PB, dan 1 event `UPCOMING` dengan 2 pendaftaran (satu didaftarkan atlet sendiri, satu oleh pelatih).
 
-  competition Competition        @relation(fields: [competitionId], references: [id])
-  athlete     AthleteProfile     @relation(fields: [athleteId], references: [id])
-  entries     CompetitionEntry[]
+Akun seed: `admin@club.local`, `coach.rina@club.local`, `coach.dimas@club.local`, `atlet1@club.local` sampai `atlet4@club.local`.
 
-  @@unique([competitionId, athleteId])
-  @@index([athleteId])
-}
-```
+Seed idempoten (aman dijalankan berulang) dan menolak berjalan saat `NODE_ENV=production`. Admin production dibuat terpisah di Phase 17.
 
-Schema final harus dibuat melalui migration, bukan manual edit production DB.
+Schema production harus dibuat melalui migration, bukan manual edit production DB.
 
 ## 11. Data Ownership
 

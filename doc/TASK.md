@@ -25,25 +25,26 @@ Gunakan:
 
 ## PHASE 1 — Database
 
-- [ ] Create AthleteProfile model.
-- [ ] Create CoachProfile model.
-- [ ] Create TrainingGroup model.
-- [ ] Create TrainingSession model.
-- [ ] Create Attendance model.
-- [ ] Create Discipline model.
-- [ ] Create TimeTrial model.
-- [ ] Create PersonalBest model.
-- [ ] Generate Better Auth tables (User, Session, Account, Verification, TwoFactor) + additional fields role/status.
-- [ ] Create Competition model (termasuk field pendaftaran & attachment).
-- [ ] Create CompetitionDiscipline model.
-- [ ] Create CompetitionRegistration model.
-- [ ] Create CompetitionEntry model (dengan registrationId).
-- [ ] Create Notification model.
-- [ ] Create AuditLog model.
-- [ ] Create RaceResult model.
-- [ ] Create CoachEvaluation model.
-- [ ] Run initial migration.
-- [ ] Create seed data.
+- [x] Create AthleteProfile model.
+- [x] Create CoachProfile model.
+- [x] Create TrainingGroup model.
+- [x] Create TrainingSession model.
+- [x] Create Attendance model.
+- [x] Create Discipline model.
+- [x] Create TimeTrial model.
+- [x] Create PersonalBest model.
+- [x] Generate Better Auth tables (User, Session, Account, Verification, TwoFactor) + additional fields role/status.
+- [x] Create Competition model (termasuk field pendaftaran & attachment).
+- [x] Create CompetitionDiscipline model.
+- [x] Create CompetitionRegistration model.
+- [x] Create CompetitionEntry model (dengan registrationId + composite FK).
+- [x] Create Notification model.
+- [x] Create AuditLog model.
+- [x] Create RaceResult model.
+- [x] Create CoachEvaluation model.
+- [x] Run initial migration (`init`, termasuk CHECK constraints).
+- [x] Create seed data (`pnpm db:seed`).
+- [x] Konfigurasi dasar Better Auth (`src/lib/auth/auth.ts`: plugin admin + twoFactor, sign up publik dimatikan).
 
 ## PHASE 2 — Authentication
 

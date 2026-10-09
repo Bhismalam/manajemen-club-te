@@ -1,7 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Schema database — lihat doc/DATABASE.md.
+// Model auth (User, Session, Account, Verification, TwoFactor) mengikuti output
+// `auth generate` (Better Auth 1.7). Jika plugin auth berubah, generate ulang ke file
+// sementara lalu samakan field di sini secara manual.
 
 generator client {
   provider = "prisma-client"
@@ -10,4 +10,569 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum UserRole {
+  ADMIN
+  COACH
+  ATHLETE
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  SICK
+  PERMISSION
+}
+
+enum SportType {
+  SWIMMING
+  FINSWIMMING
+}
+
+enum PersonalBestSource {
+  TIME_TRIAL
+  COMPETITION
+}
+
+enum CompetitionLevel {
+  CLUB
+  REGIONAL
+  PROVINCIAL
+  NATIONAL
+  INTERNATIONAL
+}
+
+enum CompetitionStatus {
+  DRAFT
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  CANCELLED
+}
+
+enum Medal {
+  GOLD
+  SILVER
+  BRONZE
+  NONE
+}
+
+enum Round {
+  HEAT
+  SEMIFINAL
+  FINAL
+  TIME_FINAL
+}
+
+enum ResultStatus {
+  FINISHED
+  DNS
+  DNF
+  DSQ
+}
+
+enum NotificationType {
+  REGISTRATION_CREATED
+  REGISTRATION_UPDATED
+  REGISTRATION_CANCELLED
+}
+
+// ============================================================================
+// Auth (Better Auth)
+// ============================================================================
+
+model User {
+  id            String   @id
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // plugin admin
+  role       UserRole  @default(ATHLETE)
+  banned     Boolean   @default(false)
+  banReason  String?
+  banExpires DateTime?
+
+  // plugin twoFactor
+  twoFactorEnabled Boolean @default(false)
+
+  // additional fields aplikasi
+  status      UserStatus @default(ACTIVE)
+  lastLoginAt DateTime?
+  deletedAt   DateTime?
+
+  sessions   Session[]
+  accounts   Account[]
+  twoFactors TwoFactor[]
+
+  athleteProfile AthleteProfile?
+  coachProfile   CoachProfile?
+
+  createdTrainingSessions TrainingSession[]         @relation("TrainingSessionCreatedBy")
+  recordedAttendances     Attendance[]              @relation("AttendanceRecordedBy")
+  recordedTimeTrials      TimeTrial[]               @relation("TimeTrialRecordedBy")
+  createdCompetitions     Competition[]             @relation("CompetitionCreatedBy")
+  registrationsMade       CompetitionRegistration[] @relation("RegistrationRegisteredBy")
+  registrationsCancelled  CompetitionRegistration[] @relation("RegistrationCancelledBy")
+  recordedRaceResults     RaceResult[]              @relation("RaceResultRecordedBy")
+  notifications           Notification[]
+  auditLogs               AuditLog[]
+
+  @@index([role])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  // Password hash (provider "credential").
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model TwoFactor {
+  id                      String    @id
+  secret                  String
+  backupCodes             String
+  userId                  String
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verified                Boolean   @default(true)
+  failedVerificationCount Int       @default(0)
+  lockedUntil             DateTime?
+
+  @@index([secret])
+  @@index([userId])
+  @@map("two_factor")
+}
+
+// ============================================================================
+// Profiles & training
+// ============================================================================
+
+model AthleteProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  athleteNumber   String    @unique
+  fullName        String
+  // Object key di bucket privat (bukan URL publik).
+  photoKey        String?
+  birthDate       DateTime  @db.Date
+  gender          Gender
+  phone           String?
+  joinDate        DateTime  @db.Date
+  trainingGroupId String?
+  isActive        Boolean   @default(true)
+  deletedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id])
+  trainingGroup TrainingGroup? @relation(fields: [trainingGroupId], references: [id], onDelete: SetNull)
+
+  attendances        Attendance[]
+  timeTrials         TimeTrial[]
+  personalBests      PersonalBest[]
+  registrations      CompetitionRegistration[]
+  competitionEntries CompetitionEntry[]
+  evaluations        CoachEvaluation[]
+
+  @@index([trainingGroupId])
+  @@index([fullName])
+  @@map("athlete_profile")
+}
+
+model CoachProfile {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  fullName       String
+  photoKey       String?
+  phone          String?
+  specialization String?
+  isActive       Boolean   @default(true)
+  deletedAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  trainingGroups TrainingGroup[]
+  evaluations    CoachEvaluation[]
+
+  @@map("coach_profile")
+}
+
+model TrainingGroup {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  coachId     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  coach CoachProfile? @relation(fields: [coachId], references: [id], onDelete: SetNull)
+
+  athletes AthleteProfile[]
+  sessions TrainingSession[]
+
+  @@index([coachId])
+  @@map("training_group")
+}
+
+model TrainingSession {
+  id              String   @id @default(cuid())
+  trainingGroupId String
+  title           String
+  // Disimpan UTC, ditampilkan dalam timezone klub.
+  startsAt        DateTime
+  endsAt          DateTime
+  location        String?
+  notes           String?
+  createdById     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  trainingGroup TrainingGroup @relation(fields: [trainingGroupId], references: [id])
+  createdBy     User          @relation("TrainingSessionCreatedBy", fields: [createdById], references: [id])
+
+  attendances Attendance[]
+  timeTrials  TimeTrial[]
+
+  @@index([trainingGroupId, startsAt])
+  @@index([startsAt])
+  @@map("training_session")
+}
+
+model Attendance {
+  id                String           @id @default(cuid())
+  trainingSessionId String
+  athleteId         String
+  status            AttendanceStatus
+  note              String?
+  recordedById      String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  trainingSession TrainingSession @relation(fields: [trainingSessionId], references: [id], onDelete: Cascade)
+  athlete         AthleteProfile  @relation(fields: [athleteId], references: [id])
+  recordedBy      User            @relation("AttendanceRecordedBy", fields: [recordedById], references: [id])
+
+  @@unique([trainingSessionId, athleteId])
+  @@index([athleteId])
+  @@map("attendance")
+}
+
+// ============================================================================
+// Performance
+// ============================================================================
+
+// Nomor lomba, contoh: 50m Freestyle (kolam 50m), 100m Surface.
+model Discipline {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  name          String
+  sportType     SportType
+  distanceMeter Int
+  style         String
+  // 25 = short course, 50 = long course.
+  poolLength    Int
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  timeTrials             TimeTrial[]
+  personalBests          PersonalBest[]
+  competitionDisciplines CompetitionDiscipline[]
+  competitionEntries     CompetitionEntry[]
+
+  @@map("discipline")
+}
+
+model TimeTrial {
+  id                String   @id @default(cuid())
+  athleteId         String
+  disciplineId      String
+  trainingSessionId String?
+  durationMs        Int
+  trialDate         DateTime
+  note              String?
+  recordedById      String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  athlete         AthleteProfile   @relation(fields: [athleteId], references: [id])
+  discipline      Discipline       @relation(fields: [disciplineId], references: [id])
+  trainingSession TrainingSession? @relation(fields: [trainingSessionId], references: [id], onDelete: SetNull)
+  recordedBy      User             @relation("TimeTrialRecordedBy", fields: [recordedById], references: [id])
+
+  @@index([athleteId, disciplineId])
+  @@index([disciplineId])
+  @@index([trainingSessionId])
+  @@map("time_trial")
+}
+
+model PersonalBest {
+  id           String             @id @default(cuid())
+  athleteId    String
+  disciplineId String
+  durationMs   Int
+  achievedAt   DateTime
+  sourceType   PersonalBestSource
+  // ID TimeTrial atau RaceResult, tergantung sourceType.
+  sourceId     String
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  athlete    AthleteProfile @relation(fields: [athleteId], references: [id])
+  discipline Discipline     @relation(fields: [disciplineId], references: [id])
+
+  @@unique([athleteId, disciplineId])
+  @@index([disciplineId])
+  @@map("personal_best")
+}
+
+model CoachEvaluation {
+  id             String   @id @default(cuid())
+  athleteId      String
+  coachId        String
+  evaluationDate DateTime @db.Date
+  strengths      String
+  weaknesses     String
+  focus          String
+  target         String
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  athlete AthleteProfile @relation(fields: [athleteId], references: [id])
+  coach   CoachProfile   @relation(fields: [coachId], references: [id])
+
+  @@index([athleteId, evaluationDate])
+  @@index([coachId])
+  @@map("coach_evaluation")
+}
+
+// ============================================================================
+// Competition & registration
+// ============================================================================
+
+model Competition {
+  id                   String            @id @default(cuid())
+  name                 String
+  description          String?
+  location             String
+  startDate            DateTime          @db.Date
+  endDate              DateTime          @db.Date
+  level                CompetitionLevel
+  status               CompetitionStatus @default(DRAFT)
+  registrationOpensAt  DateTime?
+  registrationClosesAt DateTime?
+  maxEntriesPerAthlete Int?
+  // PDF event di bucket privat.
+  attachmentKey        String?
+  attachmentName       String?
+  createdById          String
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  createdBy User @relation("CompetitionCreatedBy", fields: [createdById], references: [id])
+
+  disciplines   CompetitionDiscipline[]
+  registrations CompetitionRegistration[]
+
+  @@index([startDate])
+  @@index([status, registrationClosesAt])
+  @@map("competition")
+}
+
+// Nomor lomba yang dibuka pada sebuah event.
+model CompetitionDiscipline {
+  id            String   @id @default(cuid())
+  competitionId String
+  disciplineId  String
+  createdAt     DateTime @default(now())
+
+  competition Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  discipline  Discipline  @relation(fields: [disciplineId], references: [id])
+
+  entries CompetitionEntry[]
+
+  @@unique([competitionId, disciplineId])
+  @@index([disciplineId])
+  @@map("competition_discipline")
+}
+
+model CompetitionRegistration {
+  id                 String             @id @default(cuid())
+  competitionId      String
+  athleteId          String
+  registeredByUserId String
+  status             RegistrationStatus @default(REGISTERED)
+  note               String?
+  cancelledAt        DateTime?
+  cancelledByUserId  String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  competition  Competition    @relation(fields: [competitionId], references: [id])
+  athlete      AthleteProfile @relation(fields: [athleteId], references: [id])
+  registeredBy User           @relation("RegistrationRegisteredBy", fields: [registeredByUserId], references: [id])
+  cancelledBy  User?          @relation("RegistrationCancelledBy", fields: [cancelledByUserId], references: [id])
+
+  entries CompetitionEntry[]
+
+  @@unique([competitionId, athleteId])
+  // Target composite FK dari CompetitionEntry agar competitionId/athleteId entry selalu sama dengan registration.
+  @@unique([id, competitionId, athleteId])
+  @@index([athleteId])
+  @@map("competition_registration")
+}
+
+model CompetitionEntry {
+  id             String   @id @default(cuid())
+  registrationId String
+  competitionId  String
+  athleteId      String
+  disciplineId   String
+  // Snapshot PB saat mendaftar.
+  seedTimeMs     Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Composite FK: entry harus sesuai registration (event + atlet yang sama).
+  registration          CompetitionRegistration @relation(fields: [registrationId, competitionId, athleteId], references: [id, competitionId, athleteId], onDelete: Cascade)
+  // Composite FK: nomor lomba harus dibuka di event tersebut.
+  competitionDiscipline CompetitionDiscipline   @relation(fields: [competitionId, disciplineId], references: [competitionId, disciplineId])
+  athlete               AthleteProfile          @relation(fields: [athleteId], references: [id])
+  discipline            Discipline              @relation(fields: [disciplineId], references: [id])
+
+  raceResults RaceResult[]
+
+  @@unique([competitionId, athleteId, disciplineId])
+  @@index([registrationId])
+  @@index([athleteId])
+  @@index([disciplineId])
+  @@map("competition_entry")
+}
+
+model RaceResult {
+  id                 String       @id @default(cuid())
+  competitionEntryId String
+  durationMs         Int?
+  rank               Int?
+  medal              Medal        @default(NONE)
+  round              Round        @default(TIME_FINAL)
+  status             ResultStatus @default(FINISHED)
+  note               String?
+  recordedById       String
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  competitionEntry CompetitionEntry @relation(fields: [competitionEntryId], references: [id])
+  recordedBy       User             @relation("RaceResultRecordedBy", fields: [recordedById], references: [id])
+
+  @@unique([competitionEntryId, round])
+  @@map("race_result")
+}
+
+// ============================================================================
+// Supporting
+// ============================================================================
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType
+  linkUrl   String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@map("notification")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  // Null untuk aksi sistem.
+  actorUserId String?
+  action      String
+  entityType  String
+  entityId    String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  actor User? @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([actorUserId])
+  @@index([createdAt])
+  @@map("audit_log")
 }
