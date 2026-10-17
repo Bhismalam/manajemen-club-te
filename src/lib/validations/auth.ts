@@ -27,3 +27,20 @@ export const resetPasswordSchema = z
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Masukkan password saat ini."),
+    password: newPassword,
+    confirmPassword: z.string().min(1, "Ulangi password baru."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Password tidak sama.",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.password !== data.currentPassword, {
+    message: "Password baru harus berbeda dari password saat ini.",
+    path: ["password"],
+  });
+
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

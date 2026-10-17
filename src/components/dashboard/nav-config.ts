@@ -13,6 +13,7 @@ import {
   UserCog,
   UserRound,
   Users,
+  UsersRound,
   Waves,
 } from "lucide-react";
 
@@ -41,6 +42,7 @@ export const ROLE_NAV: Record<UserRole, RoleNav> = {
       { href: "/admin", label: "Ringkasan", icon: LayoutDashboard },
       { href: "/admin/athletes", label: "Atlet", icon: Users },
       { href: "/admin/coaches", label: "Pelatih", icon: UserCog },
+      { href: "/admin/groups", label: "Kelompok Latihan", icon: UsersRound },
       { href: "/admin/training", label: "Latihan", icon: Waves },
       { href: "/admin/attendance", label: "Absensi", icon: CalendarCheck },
       { href: "/admin/competitions", label: "Event", icon: Trophy },

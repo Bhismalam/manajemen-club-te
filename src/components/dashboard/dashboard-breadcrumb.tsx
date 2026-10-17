@@ -27,7 +27,9 @@ function buildCrumbs(role: UserRole, pathname: string): Crumb[] {
     crumbs.push({ label: section.label, href: section.href });
     // Halaman di bawah section (detail, form) diberi label umum; halaman bisa
     // menampilkan nama spesifik di judulnya sendiri.
-    if (pathname !== section.href) crumbs.push({ label: "Detail" });
+    if (pathname !== section.href) {
+      crumbs.push({ label: pathname.endsWith("/new") ? "Tambah" : "Detail" });
+    }
   }
 
   const last = crumbs.at(-1);

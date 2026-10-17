@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { ChangePasswordForm } from "@/features/auth/change-password-form";
 import { DisableMfa, RegenerateBackupCodes } from "@/features/auth/mfa/mfa-manage";
 import { MFA_SETUP_PATH } from "@/lib/auth/routes";
 import { requireUser } from "@/lib/auth/session";
@@ -16,6 +17,18 @@ export default function SecuritySettingsPage() {
   return (
     <>
       <h1 className="text-2xl font-semibold tracking-tight">Keamanan akun</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Ganti password</CardTitle>
+          <CardDescription>
+            Wajib dilakukan setelah pertama kali masuk dengan password dari admin. Perangkat lain
+            akan dikeluarkan.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChangePasswordForm />
+        </CardContent>
+      </Card>
       <Suspense fallback={<div className="h-48 animate-pulse rounded-xl bg-muted" />}>
         <MfaSection />
       </Suspense>
