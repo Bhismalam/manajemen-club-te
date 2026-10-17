@@ -1,8 +1,11 @@
 import "server-only";
 
 import type { Prisma } from "@/generated/prisma/client";
+import { prisma } from "@/lib/db/prisma";
+import { AppError } from "@/lib/errors";
+import { dateOnlyToClubInstant } from "@/lib/format";
 import type { ResultCandidate } from "@/lib/personal-best";
-import { pickPersonalBest } from "@/lib/personal-best";
+import { markProgression, pickPersonalBest } from "@/lib/personal-best";
 
 // PB adalah "materialized minimum" dari semua hasil sah atlet di satu nomor lomba:
 // time trial + hasil lomba berstatus FINISHED. Dihitung ulang setiap kali ada hasil
@@ -45,7 +48,7 @@ export async function recomputePersonalBest(
     })),
     ...races.map((race) => ({
       durationMs: race.durationMs as number,
-      achievedAt: race.competitionEntry.registration.competition.startDate,
+      achievedAt: dateOnlyToClubInstant(race.competitionEntry.registration.competition.startDate),
       sourceType: "COMPETITION" as const,
       sourceId: race.id,
     })),
@@ -69,4 +72,90 @@ export async function recomputePersonalBest(
     update: data,
   });
   return { before, after };
+}
+
+// ---------------------------------------------------------------------------
+// Query (akses ke atlet dicek oleh pemanggil: requireAthleteAccess / actor.athleteId)
+// ---------------------------------------------------------------------------
+
+export async function listPersonalBests(athleteId: string) {
+  return prisma.personalBest.findMany({
+    where: { athleteId },
+    orderBy: [{ discipline: { sportType: "asc" } }, { discipline: { distanceMeter: "asc" } }],
+    select: {
+      id: true,
+      durationMs: true,
+      achievedAt: true,
+      sourceType: true,
+      discipline: {
+        select: { id: true, name: true, sportType: true, poolLength: true },
+      },
+    },
+  });
+}
+
+export async function getDisciplineProgress(athleteId: string, disciplineId: string) {
+  const discipline = await prisma.discipline.findUnique({
+    where: { id: disciplineId },
+    select: { id: true, name: true, sportType: true, poolLength: true },
+  });
+  if (!discipline) throw new AppError("NOT_FOUND", "Nomor lomba tidak ditemukan.");
+
+  const [pb, trials, races] = await Promise.all([
+    prisma.personalBest.findUnique({
+      where: { athleteId_disciplineId: { athleteId, disciplineId } },
+      select: { durationMs: true, achievedAt: true, sourceId: true, sourceType: true },
+    }),
+    prisma.timeTrial.findMany({
+      where: { athleteId, disciplineId },
+      select: {
+        id: true,
+        durationMs: true,
+        trialDate: true,
+        note: true,
+        trainingSession: { select: { title: true } },
+      },
+    }),
+    prisma.raceResult.findMany({
+      where: {
+        status: "FINISHED",
+        durationMs: { not: null },
+        competitionEntry: { athleteId, disciplineId },
+      },
+      select: {
+        id: true,
+        durationMs: true,
+        note: true,
+        competitionEntry: {
+          select: {
+            registration: { select: { competition: { select: { name: true, startDate: true } } } },
+          },
+        },
+      },
+    }),
+  ]);
+
+  const results = markProgression([
+    ...trials.map((trial) => ({
+      id: trial.id,
+      date: trial.trialDate,
+      durationMs: trial.durationMs,
+      source: "TIME_TRIAL" as const,
+      label: trial.trainingSession?.title ?? null,
+      note: trial.note,
+    })),
+    ...races.map((race) => {
+      const competition = race.competitionEntry.registration.competition;
+      return {
+        id: race.id,
+        date: dateOnlyToClubInstant(competition.startDate),
+        durationMs: race.durationMs as number,
+        source: "COMPETITION" as const,
+        label: competition.name,
+        note: race.note,
+      };
+    }),
+  ]);
+
+  return { discipline, pb, results };
 }

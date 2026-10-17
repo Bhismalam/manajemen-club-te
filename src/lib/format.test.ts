@@ -4,6 +4,8 @@ import {
   ageOn,
   clubDateTimeToUtc,
   clubDayRange,
+  dateOnlyToClubInstant,
+  formatClubDate,
   formatDate,
   formatDateTime,
   formatWeekdayDate,
@@ -55,5 +57,18 @@ describe("jam klub (WITA)", () => {
     const { start, end } = clubDayRange("2026-10-20");
     expect(start.toISOString()).toBe("2026-10-19T16:00:00.000Z");
     expect(end.toISOString()).toBe("2026-10-20T16:00:00.000Z");
+  });
+});
+
+describe("tanggal klub", () => {
+  it("awal hari klub tidak bergeser ke hari sebelumnya", () => {
+    // 15 Okt 00:00 WITA = 14 Okt 16:00 UTC
+    expect(formatClubDate(new Date("2026-10-14T16:00:00Z"))).toBe("15 Okt 2026");
+  });
+
+  it("kolom tanggal-saja menjadi siang hari klub pada tanggal yang sama", () => {
+    const instant = dateOnlyToClubInstant(new Date("2026-11-07T00:00:00Z"));
+    expect(instant.toISOString()).toBe("2026-11-07T04:00:00.000Z");
+    expect(formatClubDate(instant)).toBe("7 Nov 2026");
   });
 });

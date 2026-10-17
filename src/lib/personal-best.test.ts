@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { describePbChange, pickPersonalBest } from "./personal-best";
+import { describePbChange, isRecentPb, markProgression, pickPersonalBest } from "./personal-best";
 
 const r = (id: string, durationMs: number, day: number) => ({
   sourceId: id,
@@ -50,5 +50,36 @@ describe("describePbChange", () => {
     expect(
       describePbChange({ durationMs: 31000 }, { durationMs: 31000, sourceId: "old" }, "x").isNewPb,
     ).toBe(false);
+  });
+});
+
+describe("markProgression", () => {
+  const p = (id: string, day: number, durationMs: number) => ({
+    id,
+    date: new Date(Date.UTC(2026, 9, day)),
+    durationMs,
+  });
+
+  it("menandai PB pada saatnya, berurutan waktu", () => {
+    const result = markProgression([
+      p("c", 9, 30900),
+      p("a", 1, 31450),
+      p("b", 5, 31800),
+      p("d", 12, 30900),
+    ]);
+    expect(result.map((r) => [r.id, r.isPbAtTime])).toEqual([
+      ["a", true],
+      ["b", false],
+      ["c", true],
+      ["d", false], // menyamai PB bukan PB baru
+    ]);
+  });
+});
+
+describe("isRecentPb", () => {
+  const now = new Date("2026-10-17T00:00:00Z");
+  it("30 hari terakhir", () => {
+    expect(isRecentPb(new Date("2026-09-20T00:00:00Z"), now)).toBe(true);
+    expect(isRecentPb(new Date("2026-09-10T00:00:00Z"), now)).toBe(false);
   });
 });

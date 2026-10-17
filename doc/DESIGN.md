@@ -117,7 +117,9 @@ Sudah tersedia (pakai ulang, jangan buat duplikat):
 
 Komponen bersama tambahan (Phase 5): `ConfirmDialog` (konfirmasi aksi penting, opsional input alasan), `StatusBadge` (titik + teks, tone success/warning/danger/info/neutral), `StatCard`, `PaginationLinks` (paginasi berbasis query string) di `src/components/shared/`. Filter daftar memakai `<form method="get">` + `NativeSelect` agar filter tercermin di URL.
 
-Belum dibuat (menyusul sesuai fase): AthleteCard, CoachCard, PerformanceChart, PersonalBestCard, RaceResultCard, EvaluationCard, FormModal, EventCard, DisciplinePicker, RegistrationTable, ExportMenu.
+Komponen Phase 6–9: `AttendanceForm` (pill radio per atlet), `PersonalBestCard` / `PersonalBestGrid`, `ProgressChart` (grafik satu seri, sumbu y dibalik, tick bulat dari `niceTimeTicks`, tooltip mouse + panah keyboard, selalu disertai tabel).
+
+Belum dibuat (menyusul sesuai fase): AthleteCard, CoachCard, RaceResultCard, EvaluationCard, FormModal, EventCard, DisciplinePicker, RegistrationTable, ExportMenu.
 
 ## 8. Dashboard Admin
 

@@ -153,11 +153,14 @@ Gunakan:
 
 ## PHASE 9 — Personal Best
 
-- [ ] PB list athlete.
-- [ ] PB detail.
-- [ ] PB dashboard card.
-- [x] PB history strategy: riwayat = semua time trial & hasil lomba; tabel `personal_best` hanya menyimpan nilai terbaik saat ini (dihitung ulang).
-- [ ] Highlight new PB.
+- [x] PB list athlete (`/athlete/personal-bests`, kartu per nomor, dikelompokkan Renang/Finswimming).
+- [x] PB detail (`/athlete/personal-bests/[disciplineId]` & `/admin/athletes/[id]/personal-bests/[disciplineId]`: PB, hasil pertama, peningkatan, grafik, semua hasil).
+- [x] PB dashboard card (`PersonalBestCard`; 3 PB terbaru di Ringkasan atlet; PB di detail atlet admin).
+- [x] PB history strategy: riwayat = semua time trial & hasil lomba; tabel `personal_best` hanya nilai terbaik saat ini (dihitung ulang).
+- [x] Highlight new PB (badge "PB baru" untuk PB ≤ 30 hari; "PB saat itu" di riwayat).
+- [x] Grafik perkembangan waktu (SVG, sumbu y dibalik "lebih cepat ↑", tick bulat, tooltip mouse & keyboard, tabel sebagai alternatif).
+- [x] Perbaikan tanggal: timestamp ditampilkan dengan `formatClubDate`; tanggal lomba dinormalkan ke siang jam klub.
+- [ ] Halaman "Atlet Binaan" pelatih + PB atlet binaan (saat ini pelatih melihat PB lewat badge di daftar time trial).
 
 ## PHASE 10 — Competition
 

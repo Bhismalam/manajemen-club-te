@@ -103,3 +103,22 @@ export function clubDayRange(date: string): { start: Date; end: Date } {
   const start = clubDateTimeToUtc(date, "00:00");
   return { start, end: new Date(start.getTime() + 24 * 60 * 60 * 1000) };
 }
+
+const clubDateFormat = new Intl.DateTimeFormat(LOCALE, {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  timeZone: CLUB_TIME_ZONE,
+});
+
+// Tanggal sebuah instant menurut kalender klub, mis. "15 Okt 2026".
+// Pakai ini untuk timestamp (time trial, PB); `formatDate` hanya untuk kolom @db.Date.
+export function formatClubDate(value: Date | null | undefined): string {
+  return value ? clubDateFormat.format(value) : "—";
+}
+
+// Kolom @db.Date (mis. tanggal lomba) → instant pukul 12:00 jam klub pada tanggal yang sama,
+// agar bisa dibandingkan & ditampilkan bersama timestamp lain tanpa bergeser hari.
+export function dateOnlyToClubInstant(value: Date): Date {
+  return clubDateTimeToUtc(value.toISOString().slice(0, 10), "12:00");
+}

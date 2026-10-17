@@ -1,22 +1,22 @@
-import { Activity } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageSkeleton } from "@/components/shared/page-skeleton";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GENDER_LABEL, USER_STATUS_LABEL } from "@/constants/labels";
 import { AthleteProfileForm } from "@/features/athletes/athlete-profile-form";
+import { PersonalBestGrid } from "@/features/personal-bests/personal-best-card";
 import { userStatusTone } from "@/features/users/user-status";
 import { isAppError } from "@/lib/errors";
 import { ageOn, formatDate, toDateInputValue } from "@/lib/format";
 import { requireActor } from "@/lib/permissions/actor";
 import type { Actor } from "@/lib/permissions/types";
 import { getAthleteDetail } from "@/services/athlete-service";
+import { listPersonalBests } from "@/services/personal-best-service";
 import { listTrainingGroupOptions } from "@/services/training-group-service";
 
 export const metadata: Metadata = { title: "Detail Atlet" };
@@ -41,7 +41,11 @@ async function loadAthlete(actor: Actor, id: string) {
 async function AthleteDetail({ params }: { params: PageProps<"/admin/athletes/[id]">["params"] }) {
   const actor = await requireActor("ADMIN");
   const { id } = await params;
-  const [athlete, groups] = await Promise.all([loadAthlete(actor, id), listTrainingGroupOptions()]);
+  const [athlete, groups, pbs] = await Promise.all([
+    loadAthlete(actor, id),
+    listTrainingGroupOptions(),
+    listPersonalBests(id),
+  ]);
 
   return (
     <>
@@ -125,11 +129,16 @@ async function AthleteDetail({ params }: { params: PageProps<"/admin/athletes/[i
             </CardContent>
           </Card>
 
-          <EmptyState
-            icon={Activity}
-            title="Riwayat performa belum tersedia"
-            description={`${athlete._count.personalBests} PB, ${athlete._count.timeTrials} time trial, dan ${athlete._count.attendances} catatan absensi tercatat. Detailnya tampil di sini setelah fitur latihan dan performa dibangun.`}
-          />
+          <section className="flex flex-col gap-3">
+            <h2 className="text-lg font-semibold">Personal best</h2>
+            <PersonalBestGrid
+              pbs={pbs}
+              hrefFor={(disciplineId) =>
+                `/admin/athletes/${athlete.id}/personal-bests/${disciplineId}`
+              }
+              emptyDescription={`${athlete._count.timeTrials} time trial tercatat. PB muncul setelah ada time trial atau hasil lomba.`}
+            />
+          </section>
         </div>
       </div>
     </>

@@ -127,7 +127,7 @@ Route contoh:
 
 - `/admin`
 - `/admin/users`, `/admin/users/new` (`?role=COACH|ATHLETE|ADMIN`), `/admin/users/[id]`
-- `/admin/athletes`, `/admin/athletes/[id]`
+- `/admin/athletes`, `/admin/athletes/[id]`, `/admin/athletes/[id]/personal-bests/[disciplineId]`
 - `/admin/coaches`, `/admin/coaches/[id]`
 - `/admin/groups`, `/admin/groups/new`, `/admin/groups/[id]`
 - `/admin/training`, `/admin/training/new`, `/admin/training/[id]` (termasuk pencatatan absensi)
@@ -158,7 +158,7 @@ Route contoh:
 - `/athlete/events/[id]` (detail, unduh PDF, pilih nomor lomba)
 - `/athlete/time-trials`
 - `/athlete/results`
-- `/athlete/personal-bests`
+- `/athlete/personal-bests`, `/athlete/personal-bests/[disciplineId]`
 - `/athlete/evaluations`
 
 ### Auth & Settings (semua role)
@@ -314,6 +314,8 @@ PB adalah **nilai terbaik yang dihitung ulang** dari semua hasil sah atlet di sa
 Konsekuensinya: mengoreksi atau menghapus time trial yang sedang menjadi PB otomatis menurunkan PB ke hasil terbaik berikutnya. Riwayat PB = daftar time trial & hasil lomba itu sendiri.
 
 ## 11. Time Storage
+
+Tanggal untuk timestamp (time trial, PB) ditampilkan dengan `formatClubDate`; `formatDate` hanya untuk kolom `@db.Date`. Tanggal lomba (`@db.Date`) yang perlu dibandingkan dengan timestamp diubah dengan `dateOnlyToClubInstant` (siang hari klub).
 
 Waktu sesi latihan diinput dalam jam klub (WITA / Asia/Makassar, `CLUB_UTC_OFFSET = +08:00`, label `CLUB_TIME_ZONE_LABEL` di `src/lib/format.ts`) dan disimpan sebagai UTC. Pakai `clubDateTimeToUtc`, `toClubDateInput`, `toClubTimeInput`, `formatTime`, `formatWeekdayDate`, `clubDayRange`; jangan memformat tanggal dengan zona waktu server.
 
