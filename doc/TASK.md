@@ -119,7 +119,7 @@ Gunakan:
 ## PHASE 6 — Training
 
 - [x] Training session list (admin: semua kelompok, coach: kelompok binaan; dikelompokkan per hari).
-- [x] Create training session (jam diinput WIB, disimpan UTC).
+- [x] Create training session (jam diinput WITA, disimpan UTC).
 - [x] Edit training session.
 - [x] Training detail (hapus diblokir jika sudah ada absensi/time trial).
 - [x] Filter by group/date (default mulai hari ini).
@@ -129,11 +129,14 @@ Gunakan:
 
 ## PHASE 7 — Attendance
 
-- [ ] Attendance page.
-- [ ] Record attendance.
-- [ ] Edit attendance.
-- [ ] Athlete attendance history.
-- [ ] Attendance summary.
+- [x] Attendance page (rekap `/admin/attendance`, `/coach/attendance`: per atlet + sesi belum diabsen, default 30 hari).
+- [x] Record attendance (di detail sesi: Hadir/Izin/Sakit/Tidak hadir + catatan, "Tandai sisanya hadir").
+- [x] Edit attendance (upsert per atlet, bisa diubah kapan saja).
+- [x] Athlete attendance history (di `/athlete/schedule`: persentase + riwayat).
+- [x] Attendance summary (persentase = Hadir ÷ sesi tercatat).
+- [x] Aturan server: hanya kelompok yang dikelola, mulai hari sesi (jam klub), hanya anggota kelompok / yang sudah tercatat.
+- [x] Zona waktu klub diganti ke WITA (Asia/Makassar, +08:00).
+- [ ] Export rekap absensi (Excel/PDF) — post-MVP.
 
 ## PHASE 8 — Time Trial
 

@@ -1,16 +1,22 @@
-import { CalendarCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 
-import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { isAppError } from "@/lib/errors";
-import { formatDateTime, formatTime, formatWeekdayDate, toClubDateInput } from "@/lib/format";
+import {
+  CLUB_TIME_ZONE_LABEL,
+  formatDateTime,
+  formatTime,
+  formatWeekdayDate,
+  toClubDateInput,
+} from "@/lib/format";
 import type { Actor } from "@/lib/permissions/types";
 import {
   getTrainingSession,
   listManageableGroupOptions,
 } from "@/services/training-session-service";
+
+import { AttendanceSection } from "@/features/attendance/attendance-section";
 
 import { DeleteSessionButton, SessionForm } from "./session-form";
 
@@ -44,7 +50,7 @@ export async function SessionDetail({
     <>
       <PageHeader
         title={session.title}
-        description={`${formatWeekdayDate(session.startsAt)} · ${formatTime(session.startsAt)}–${formatTime(session.endsAt)} WIB`}
+        description={`${formatWeekdayDate(session.startsAt)} · ${formatTime(session.startsAt)}–${formatTime(session.endsAt)} ${CLUB_TIME_ZONE_LABEL}`}
       />
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -78,11 +84,7 @@ export async function SessionDetail({
         </Card>
 
         <div className="flex flex-col gap-6 lg:col-span-2">
-          <EmptyState
-            icon={CalendarCheck}
-            title="Absensi belum tersedia"
-            description={`${session._count.attendances} catatan absensi tersimpan. Pencatatan absensi per atlet hadir di tahap berikutnya.`}
-          />
+          <AttendanceSection actor={actor} sessionId={session.id} />
 
           {session.canManage && (
             <Card>

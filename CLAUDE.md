@@ -38,7 +38,7 @@ Deployment:
 - Next.js 16: file `middleware.ts` sudah diganti `proxy.ts` (runtime Node.js). Baca `node_modules/next/dist/docs/` sebelum memakai API yang belum pasti.
 - Prisma 7: client digenerate ke `src/generated/prisma` (tidak di-commit). Import dari `@/generated/prisma/client`, dan pakai instance tunggal di `src/lib/db/prisma.ts`, jangan membuat `new PrismaClient()` di tempat lain.
 - Koneksi database dibaca dari `DATABASE_URL` di `.env.local` (oleh Next.js dan `prisma.config.ts`).
-- Waktu: timestamp UTC di DB, tampil & input dalam WIB lewat helper di `src/lib/format.ts` (jangan `toLocaleString` tanpa zona waktu).
+- Waktu: timestamp UTC di DB, tampil & input dalam jam klub (WITA) lewat helper di `src/lib/format.ts` (jangan `toLocaleString` tanpa zona waktu).
 - Helper `cn()` ada di `src/lib/utils.ts` (dipakai shadcn). Jangan membuat folder `src/lib/utils/`.
 
 ### 1.2 Perintah

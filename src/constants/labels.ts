@@ -1,4 +1,4 @@
-import type { Gender, UserRole, UserStatus } from "@/generated/prisma/enums";
+import type { AttendanceStatus, Gender, UserRole, UserStatus } from "@/generated/prisma/enums";
 
 // Label tampilan untuk enum database (Bahasa Indonesia).
 
@@ -17,4 +17,11 @@ export const USER_STATUS_LABEL: Record<UserStatus, string> = {
 export const GENDER_LABEL: Record<Gender, string> = {
   MALE: "Laki-laki",
   FEMALE: "Perempuan",
+};
+
+export const ATTENDANCE_LABEL: Record<AttendanceStatus, string> = {
+  PRESENT: "Hadir",
+  PERMISSION: "Izin",
+  SICK: "Sakit",
+  ABSENT: "Tidak hadir",
 };

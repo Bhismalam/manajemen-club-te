@@ -18,8 +18,8 @@ describe("format", () => {
     expect(toDateInputValue(new Date("2011-04-12T00:00:00Z"))).toBe("2011-04-12");
   });
 
-  it("timestamp ditampilkan dalam WIB", () => {
-    // 17:30 UTC = 00:30 WIB hari berikutnya
+  it("timestamp ditampilkan dalam WITA", () => {
+    // 17:30 UTC = 01:30 WITA hari berikutnya
     expect(formatDateTime(new Date("2026-10-17T17:30:00Z"))).toContain("18 Okt 2026");
   });
 
@@ -35,25 +35,25 @@ describe("format", () => {
   });
 });
 
-describe("jam klub (WIB)", () => {
-  it("input tanggal + jam WIB disimpan sebagai UTC", () => {
-    expect(clubDateTimeToUtc("2026-10-20", "16:30").toISOString()).toBe("2026-10-20T09:30:00.000Z");
-    expect(clubDateTimeToUtc("2026-10-20", "05:00").toISOString()).toBe("2026-10-19T22:00:00.000Z");
+describe("jam klub (WITA)", () => {
+  it("input tanggal + jam WITA disimpan sebagai UTC", () => {
+    expect(clubDateTimeToUtc("2026-10-20", "16:30").toISOString()).toBe("2026-10-20T08:30:00.000Z");
+    expect(clubDateTimeToUtc("2026-10-20", "05:00").toISOString()).toBe("2026-10-19T21:00:00.000Z");
   });
 
-  it("kembali ke tanggal & jam WIB untuk form edit", () => {
-    const instant = new Date("2026-10-19T22:00:00.000Z");
+  it("kembali ke tanggal & jam WITA untuk form edit", () => {
+    const instant = new Date("2026-10-19T21:00:00.000Z");
     expect(toClubDateInput(instant)).toBe("2026-10-20");
     expect(toClubTimeInput(instant)).toBe("05:00");
   });
 
-  it("nama hari mengikuti WIB", () => {
-    expect(formatWeekdayDate(new Date("2026-10-19T22:00:00.000Z"))).toBe("Selasa, 20 Oktober 2026");
+  it("nama hari mengikuti WITA", () => {
+    expect(formatWeekdayDate(new Date("2026-10-19T21:00:00.000Z"))).toBe("Selasa, 20 Oktober 2026");
   });
 
-  it("rentang satu hari WIB", () => {
+  it("rentang satu hari WITA", () => {
     const { start, end } = clubDayRange("2026-10-20");
-    expect(start.toISOString()).toBe("2026-10-19T17:00:00.000Z");
-    expect(end.toISOString()).toBe("2026-10-20T17:00:00.000Z");
+    expect(start.toISOString()).toBe("2026-10-19T16:00:00.000Z");
+    expect(end.toISOString()).toBe("2026-10-20T16:00:00.000Z");
   });
 });

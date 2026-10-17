@@ -13,7 +13,7 @@ import type { TrainingSessionFilter } from "@/lib/validations/training";
 import { listTrainingSessions } from "@/services/training-session-service";
 import type { GroupOption } from "@/services/training-group-service";
 
-// Daftar sesi latihan untuk admin & pelatih, dikelompokkan per hari (WIB).
+// Daftar sesi latihan untuk admin & pelatih, dikelompokkan per hari (jam klub).
 export async function SessionList({
   actor,
   filter,

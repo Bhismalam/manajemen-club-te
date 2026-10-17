@@ -130,7 +130,8 @@ Route contoh:
 - `/admin/athletes`, `/admin/athletes/[id]`
 - `/admin/coaches`, `/admin/coaches/[id]`
 - `/admin/groups`, `/admin/groups/new`, `/admin/groups/[id]`
-- `/admin/training`, `/admin/training/new`, `/admin/training/[id]`
+- `/admin/training`, `/admin/training/new`, `/admin/training/[id]` (termasuk pencatatan absensi)
+- `/admin/attendance` (rekap)
 - `/admin/competitions`
 - `/admin/competitions/[id]` (detail, nomor lomba, PDF, periode pendaftaran)
 - `/admin/competitions/[id]/registrations` (rekap pendaftar + download)
@@ -138,7 +139,8 @@ Route contoh:
 ### Coach
 
 - `/coach`
-- `/coach/training`, `/coach/training/new`, `/coach/training/[id]`
+- `/coach/training`, `/coach/training/new`, `/coach/training/[id]` (termasuk pencatatan absensi)
+- `/coach/attendance` (rekap)
 - `/coach/attendance`
 - `/coach/athletes`
 - `/coach/time-trials`
@@ -182,6 +184,7 @@ Service layer:
 - `AthleteService`
 - `CoachService`
 - `TrainingSessionService` (`training-session-service.ts`)
+- `AttendanceService` (`attendance-service.ts`: roster sesi, simpan absensi, rekap, riwayat atlet; rumus di `src/lib/attendance.ts`)
 - `AttendanceService`
 - `TimeTrialService`
 - `PersonalBestService`
@@ -309,7 +312,7 @@ Saat hasil baru dibuat:
 
 ## 11. Time Storage
 
-Waktu sesi latihan diinput dalam jam klub (WIB, `CLUB_UTC_OFFSET = +07:00` di `src/lib/format.ts`) dan disimpan sebagai UTC. Pakai `clubDateTimeToUtc`, `toClubDateInput`, `toClubTimeInput`, `formatTime`, `formatWeekdayDate`, `clubDayRange`; jangan memformat tanggal dengan zona waktu server.
+Waktu sesi latihan diinput dalam jam klub (WITA / Asia/Makassar, `CLUB_UTC_OFFSET = +08:00`, label `CLUB_TIME_ZONE_LABEL` di `src/lib/format.ts`) dan disimpan sebagai UTC. Pakai `clubDateTimeToUtc`, `toClubDateInput`, `toClubTimeInput`, `formatTime`, `formatWeekdayDate`, `clubDayRange`; jangan memformat tanggal dengan zona waktu server.
 
 ### Durasi
 

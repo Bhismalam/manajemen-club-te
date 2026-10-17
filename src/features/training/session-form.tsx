@@ -12,6 +12,7 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/c
 import { Input } from "@/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
+import { CLUB_TIME_ZONE_LABEL } from "@/lib/format";
 import type { TrainingSessionInput } from "@/lib/validations/training";
 import { trainingSessionSchema } from "@/lib/validations/training";
 import type { GroupOption } from "@/services/training-group-service";
@@ -32,7 +33,7 @@ const FIELDS = [
   "notes",
 ] as const;
 
-// Form tambah (tanpa sessionId) & edit sesi latihan. Jam diisi dalam WIB.
+// Form tambah (tanpa sessionId) & edit sesi latihan. Jam diisi dalam zona waktu klub.
 export function SessionForm({
   sessionId,
   defaults,
@@ -122,7 +123,7 @@ export function SessionForm({
             <FieldError errors={[errors.date]} />
           </Field>
           <Field data-invalid={Boolean(errors.startTime)}>
-            <FieldLabel htmlFor="startTime">Mulai (WIB)</FieldLabel>
+            <FieldLabel htmlFor="startTime">Mulai ({CLUB_TIME_ZONE_LABEL})</FieldLabel>
             <Input
               id="startTime"
               type="time"
@@ -132,7 +133,7 @@ export function SessionForm({
             <FieldError errors={[errors.startTime]} />
           </Field>
           <Field data-invalid={Boolean(errors.endTime)}>
-            <FieldLabel htmlFor="endTime">Selesai (WIB)</FieldLabel>
+            <FieldLabel htmlFor="endTime">Selesai ({CLUB_TIME_ZONE_LABEL})</FieldLabel>
             <Input
               id="endTime"
               type="time"

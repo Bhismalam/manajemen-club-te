@@ -1,7 +1,9 @@
 // Format tampilan. Timestamp disimpan UTC dan ditampilkan dalam zona waktu klub;
 // kolom tanggal saja (@db.Date) dibaca sebagai tanggal UTC agar tidak bergeser hari.
 
-export const CLUB_TIME_ZONE = "Asia/Jakarta";
+// Zona waktu klub: WITA. Ubah CLUB_TIME_ZONE, CLUB_UTC_OFFSET, dan CLUB_TIME_ZONE_LABEL bersamaan.
+export const CLUB_TIME_ZONE = "Asia/Makassar";
+export const CLUB_TIME_ZONE_LABEL = "WITA";
 const LOCALE = "id-ID";
 
 const dateOnlyFormat = new Intl.DateTimeFormat(LOCALE, {
@@ -45,11 +47,10 @@ export function toDateInputValue(value: Date | null | undefined): string {
 }
 
 // ---------------------------------------------------------------------------
-// Jam klub (WIB). Indonesia tidak memakai DST, jadi offset tetap +07:00.
-// Ganti CLUB_UTC_OFFSET bersama CLUB_TIME_ZONE jika klub berada di WITA/WIT.
+// Jam klub (WITA). Indonesia tidak memakai DST, jadi offset tetap +08:00.
 // ---------------------------------------------------------------------------
 
-export const CLUB_UTC_OFFSET = "+07:00";
+export const CLUB_UTC_OFFSET = "+08:00";
 
 const timeFormat = new Intl.DateTimeFormat(LOCALE, {
   hour: "2-digit",
