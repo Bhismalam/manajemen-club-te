@@ -86,14 +86,16 @@ Gunakan:
 
 ## PHASE 4 — Dashboard Layout
 
-- [ ] Global app shell.
-- [ ] Sidebar.
-- [ ] Header.
-- [ ] Mobile navigation.
-- [ ] Breadcrumb.
-- [ ] Loading state.
-- [ ] Error state.
-- [ ] Empty state.
+- [x] Global app shell (`DashboardShell` di `admin|coach|athlete/layout.tsx`).
+- [x] Sidebar (navy, penanda aktif marka "T").
+- [x] Header (trigger sidebar, breadcrumb, menu pengguna).
+- [x] Mobile navigation (drawer untuk semua role + bottom nav atlet).
+- [x] Breadcrumb.
+- [x] Loading state (`loading.tsx` + `PageSkeleton`).
+- [x] Error state (`error.tsx` + `ErrorState`, tampilkan kode digest).
+- [x] Empty state (`EmptyState`) + halaman "sedang dibangun" untuk menu yang belum ada.
+- [x] Token warna & tipografi sesuai DESIGN.md, halaman 404.
+- [ ] Permission denied state (saat ini role lain diarahkan ke dashboard sendiri).
 
 ## PHASE 5 — Admin
 

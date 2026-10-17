@@ -264,6 +264,12 @@ Contoh:
 - Empty state.
 - Error state.
 - Confirmation untuk destructive action.
+- Halaman dashboard baru: taruh di `src/app/{admin|coach|athlete}/...`, otomatis memakai `DashboardShell`. Mulai dengan `PageHeader`, bungkus bagian yang membaca session/data dengan `<Suspense fallback={<PageSkeleton />}>`.
+- Pakai `EmptyState`, `ErrorState`, `PageSkeleton` dari `src/components/shared/` untuk state halaman.
+- Menu baru ditambahkan di `src/components/dashboard/nav-config.ts`.
+- Client component yang memakai `usePathname` / `useSearchParams` wajib berada di dalam `<Suspense>` (build gagal di route dinamis jika tidak).
+- Warna lewat token (`bg-primary`, `text-muted-foreground`); aqua (`lane`/`ring`) hanya untuk item aktif & fokus.
+- Setelah menambah folder route baru, restart `pnpm dev` jika route belum terdeteksi (404).
 
 ## 11. Git Workflow
 

@@ -24,42 +24,40 @@ Dashboard lebih fokus pada efisiensi dan readability.
 6. Status harus mudah dibedakan.
 7. Semua action penting memiliki feedback.
 
-## 3. Suggested Color Direction
+## 3. Color
 
-Gunakan nuansa:
+Token ada di `src/app/globals.css` (`:root`, plus `.dark` untuk mode gelap nanti). Pakai nama token Tailwind (`bg-primary`, `text-muted-foreground`), jangan hex langsung.
 
-- Deep navy.
-- Ocean blue.
-- Aqua/cyan sebagai accent.
-- White / off-white.
-- Neutral gray.
+| Token              | Hex       | Peran                                                 |
+| ------------------ | --------- | ----------------------------------------------------- |
+| `sidebar`          | `#0B1F33` | Deep navy: sidebar                                    |
+| `primary`          | `#0B6FA4` | Ocean blue: tombol utama, link, item aktif bottom nav |
+| `lane` / `ring`    | `#2EC4D6` | Aqua: penanda item aktif & fokus keyboard saja        |
+| `background`       | `#F6F9FB` | Off-white dingin                                      |
+| `card`             | `#FFFFFF` | Permukaan konten                                      |
+| `foreground`       | `#0F1E2C` | Teks utama                                            |
+| `muted-foreground` | `#526273` | Teks sekunder (kontras ≥ 4.5:1 di background)         |
+| `border`           | `#DCE5EC` | Garis                                                 |
 
-Gunakan warna status:
-
-- Success.
-- Warning.
-- Error.
-- Info.
-
-Hindari penggunaan warna status sebagai warna dekoratif.
+Warna status (hanya untuk status, bukan dekorasi): `success` `#1F8A5B`, `warning` `#A76A12`, `destructive` `#C9372C`, `info` `#0B6FA4`. Status juga wajib punya label/ikon, tidak hanya warna.
 
 ## 4. Typography
 
-Gunakan sans-serif modern.
-
-Contoh:
-
-- Inter.
-- Geist.
-- Plus Jakarta Sans.
+- Judul (`h1`–`h3`, `font-heading`): **Plus Jakarta Sans** 600/700, `tracking-tight`.
+- Teks: **Geist**.
+- Data (waktu lomba, statistik, kode): **Geist Mono** angka tabular lewat class `numeric`.
 
 Hierarchy:
 
-- H1: 32–40 px.
-- H2: 24–32 px.
-- H3: 20–24 px.
+- H1 halaman: 24–28 px (`PageHeader`).
+- H2: 20–24 px.
+- H3: 16–20 px.
 - Body: 14–16 px.
 - Caption: 12–14 px.
+
+### Ciri khas
+
+Marka **"T"** di ujung lintasan dasar kolam renang: dipakai sebagai logo (`BrandMark`) dan sebagai penanda item navigasi aktif (`.lane-mark`, aqua). Ini satu-satunya elemen dekoratif; selebihnya tenang.
 
 ## 5. Layout
 
@@ -81,69 +79,43 @@ Hierarchy:
 
 ## 6. Navigation
 
-### Admin
+Sumber tunggal: `src/components/dashboard/nav-config.ts` (`ROLE_NAV`). Label memakai Bahasa Indonesia.
 
-- Overview.
-- Athletes.
-- Coaches.
-- Training.
-- Attendance.
-- Competitions.
-- Results.
-- Users.
-- Settings.
+### Admin (`/admin`)
 
-### Coach
+Ringkasan · Atlet · Pelatih · Latihan · Absensi · Event · Hasil Lomba · Pengguna
 
-- Overview.
-- My Athletes.
-- Training.
-- Attendance.
-- Time Trials.
-- Competitions.
-- Evaluations.
+### Coach (`/coach`)
 
-### Athlete
+Ringkasan · Atlet Binaan · Latihan · Absensi · Time Trial · Event · Evaluasi
 
-- Overview.
-- Schedule.
-- Events (daftar event).
-- Personal Best.
-- Time Trials.
-- Competition History.
-- Evaluation.
-- Profile.
+### Athlete (`/athlete`)
+
+Ringkasan · Jadwal · Event · Personal Best · Time Trial · Riwayat Lomba · Evaluasi · Profil
+
+Bottom navigation mobile (atlet): Ringkasan, Jadwal, Event, Personal Best, Profil.
 
 ### Semua role
 
-- Settings → Security (password, MFA, recovery codes) di menu avatar/header.
+Menu pengguna (kanan atas): Keamanan akun, Keluar.
+
+Menu yang halamannya belum dibuat ditangani route `[...section]` (tampilan "sedang dibangun"); halaman nyata otomatis menggantikannya.
 
 ## 7. Core Components
 
-- AppSidebar.
-- TopNavigation.
-- StatCard.
-- AthleteCard.
-- CoachCard.
-- DataTable.
-- FilterBar.
-- EmptyState.
-- StatusBadge.
-- PerformanceChart.
-- PersonalBestCard.
-- RaceResultCard.
-- EvaluationCard.
-- ConfirmDialog.
-- FormModal.
-- Toast.
-- EventCard (nama, tanggal, lokasi, deadline pendaftaran, status "Terdaftar").
-- DisciplinePicker (checkbox nomor lomba + PB/seed time di samping tiap nomor).
-- AttachmentButton (unduh PDF event).
-- RegistrationTable (rekap pendaftar dengan toggle Per Atlet / Per Nomor Lomba).
-- ExportMenu (Download Excel / Download PDF).
-- NotificationBell (badge pendaftaran baru untuk admin).
-- MfaSetup (QR code, input kode 6 digit, tampilan recovery codes).
-- OtpInput (input kode 6 digit di halaman login two-factor).
+Sudah tersedia (pakai ulang, jangan buat duplikat):
+
+| Komponen                                                                                                                                                                 | Lokasi                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| `DashboardShell` (sidebar, header, breadcrumb, menu user, bottom nav atlet)                                                                                              | `src/components/dashboard/dashboard-shell.tsx` |
+| `PageHeader` (judul, deskripsi, aksi)                                                                                                                                    | `src/components/shared/page-header.tsx`        |
+| `EmptyState`                                                                                                                                                             | `src/components/shared/empty-state.tsx`        |
+| `ErrorState` (dipakai `error.tsx`)                                                                                                                                       | `src/components/shared/error-state.tsx`        |
+| `PageSkeleton` (dipakai `loading.tsx`)                                                                                                                                   | `src/components/shared/page-skeleton.tsx`      |
+| `BrandMark`                                                                                                                                                              | `src/components/dashboard/brand-mark.tsx`      |
+| shadcn/ui: button, input, label, field, card, alert, checkbox, input-otp, breadcrumb, dropdown-menu, avatar, skeleton, empty, sidebar, sheet, tooltip, separator, sonner | `src/components/ui/`                           |
+
+Belum dibuat (menyusul sesuai fase): StatCard, AthleteCard, CoachCard, DataTable, FilterBar, StatusBadge, PerformanceChart, PersonalBestCard, RaceResultCard, EvaluationCard, ConfirmDialog, FormModal, EventCard, DisciplinePicker, RegistrationTable, ExportMenu.
 
 ## 8. Dashboard Admin
 
