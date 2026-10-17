@@ -38,6 +38,7 @@ Deployment:
 - Next.js 16: file `middleware.ts` sudah diganti `proxy.ts` (runtime Node.js). Baca `node_modules/next/dist/docs/` sebelum memakai API yang belum pasti.
 - Prisma 7: client digenerate ke `src/generated/prisma` (tidak di-commit). Import dari `@/generated/prisma/client`, dan pakai instance tunggal di `src/lib/db/prisma.ts`, jangan membuat `new PrismaClient()` di tempat lain.
 - Koneksi database dibaca dari `DATABASE_URL` di `.env.local` (oleh Next.js dan `prisma.config.ts`).
+- Waktu: timestamp UTC di DB, tampil & input dalam WIB lewat helper di `src/lib/format.ts` (jangan `toLocaleString` tanpa zona waktu).
 - Helper `cn()` ada di `src/lib/utils.ts` (dipakai shadcn). Jangan membuat folder `src/lib/utils/`.
 
 ### 1.2 Perintah
@@ -205,7 +206,8 @@ Untuk izin berbasis data (ownership), pakai `src/lib/permissions/`:
 
 - `requireActor()` untuk mendapatkan `Actor` (sudah termasuk cek MFA admin).
 - `requireAthleteAccess(actor, athleteId, "view" | "manage")` untuk satu resource.
-- `athleteScope(actor)` di **setiap** query daftar data atlet.
+- `athleteScope(actor)` di **setiap** query daftar data atlet; `trainingSessionScope(actor)` untuk sesi latihan.
+- Ambil satu resource dengan `findFirst({ where: { AND: [{ id }, scope] } })` → 404 jika di luar scope.
 - Tambahkan kebijakan baru sebagai fungsi murni di `policies.ts` beserta tesnya.
 
 ## 7. Database Rules

@@ -118,12 +118,14 @@ Gunakan:
 
 ## PHASE 6 — Training
 
-- [ ] Training session list.
-- [ ] Create training session.
-- [ ] Edit training session.
-- [ ] Training detail.
-- [ ] Filter by group/date.
-- [ ] Athlete schedule view.
+- [x] Training session list (admin: semua kelompok, coach: kelompok binaan; dikelompokkan per hari).
+- [x] Create training session (jam diinput WIB, disimpan UTC).
+- [x] Edit training session.
+- [x] Training detail (hapus diblokir jika sudah ada absensi/time trial).
+- [x] Filter by group/date (default mulai hari ini).
+- [x] Athlete schedule view (`/athlete/schedule`, jadwal kelompoknya mulai hari ini).
+- [x] Isolasi: coach hanya bisa membuat/mengubah sesi kelompok miliknya (dicek server), sesi kelompok lain = 404.
+- [ ] Sesi berulang (mis. tiap Senin & Rabu) — belum, setiap sesi dibuat satu per satu.
 
 ## PHASE 7 — Attendance
 

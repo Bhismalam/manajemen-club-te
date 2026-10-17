@@ -17,3 +17,24 @@ export function athleteScope(actor: Actor): Prisma.AthleteProfileWhereInput {
       return actor.athleteId ? { id: actor.athleteId } : NONE;
   }
 }
+
+// Sesi latihan yang boleh dilihat: admin semua, coach kelompok miliknya, atlet kelompoknya sendiri.
+export function trainingSessionScope(actor: Actor): Prisma.TrainingSessionWhereInput {
+  switch (actor.role) {
+    case "ADMIN":
+      return {};
+    case "COACH":
+      return actor.coachId ? { trainingGroup: { coachId: actor.coachId } } : { id: { in: [] } };
+    case "ATHLETE":
+      return actor.athleteId
+        ? { trainingGroup: { athletes: { some: { id: actor.athleteId } } } }
+        : { id: { in: [] } };
+  }
+}
+
+// Kelompok latihan yang boleh dikelola (buat/edit sesi): admin semua, coach miliknya.
+export function manageableGroupScope(actor: Actor): Prisma.TrainingGroupWhereInput {
+  if (actor.role === "ADMIN") return {};
+  if (actor.role === "COACH" && actor.coachId) return { coachId: actor.coachId };
+  return { id: { in: [] } };
+}

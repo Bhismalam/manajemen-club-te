@@ -130,7 +130,7 @@ Route contoh:
 - `/admin/athletes`, `/admin/athletes/[id]`
 - `/admin/coaches`, `/admin/coaches/[id]`
 - `/admin/groups`, `/admin/groups/new`, `/admin/groups/[id]`
-- `/admin/training`
+- `/admin/training`, `/admin/training/new`, `/admin/training/[id]`
 - `/admin/competitions`
 - `/admin/competitions/[id]` (detail, nomor lomba, PDF, periode pendaftaran)
 - `/admin/competitions/[id]/registrations` (rekap pendaftar + download)
@@ -138,7 +138,7 @@ Route contoh:
 ### Coach
 
 - `/coach`
-- `/coach/training`
+- `/coach/training`, `/coach/training/new`, `/coach/training/[id]`
 - `/coach/attendance`
 - `/coach/athletes`
 - `/coach/time-trials`
@@ -181,7 +181,7 @@ Service layer:
 - `AuthService`
 - `AthleteService`
 - `CoachService`
-- `TrainingService`
+- `TrainingSessionService` (`training-session-service.ts`)
 - `AttendanceService`
 - `TimeTrialService`
 - `PersonalBestService`
@@ -308,6 +308,10 @@ Saat hasil baru dibuat:
 5. Simpan referensi sumber hasil.
 
 ## 11. Time Storage
+
+Waktu sesi latihan diinput dalam jam klub (WIB, `CLUB_UTC_OFFSET = +07:00` di `src/lib/format.ts`) dan disimpan sebagai UTC. Pakai `clubDateTimeToUtc`, `toClubDateInput`, `toClubTimeInput`, `formatTime`, `formatWeekdayDate`, `clubDayRange`; jangan memformat tanggal dengan zona waktu server.
+
+### Durasi
 
 Semua race/time trial time disimpan sebagai integer milliseconds.
 

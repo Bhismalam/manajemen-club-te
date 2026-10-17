@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { ageOn, formatDate, formatDateTime, toDateInputValue } from "./format";
+import {
+  ageOn,
+  clubDateTimeToUtc,
+  clubDayRange,
+  formatDate,
+  formatDateTime,
+  formatWeekdayDate,
+  toClubDateInput,
+  toClubTimeInput,
+  toDateInputValue,
+} from "./format";
 
 describe("format", () => {
   it("tanggal saja tidak bergeser hari", () => {
@@ -22,5 +32,28 @@ describe("format", () => {
     const birth = new Date("2011-04-12T00:00:00Z");
     expect(ageOn(birth, new Date("2026-04-11T00:00:00Z"))).toBe(14);
     expect(ageOn(birth, new Date("2026-04-12T00:00:00Z"))).toBe(15);
+  });
+});
+
+describe("jam klub (WIB)", () => {
+  it("input tanggal + jam WIB disimpan sebagai UTC", () => {
+    expect(clubDateTimeToUtc("2026-10-20", "16:30").toISOString()).toBe("2026-10-20T09:30:00.000Z");
+    expect(clubDateTimeToUtc("2026-10-20", "05:00").toISOString()).toBe("2026-10-19T22:00:00.000Z");
+  });
+
+  it("kembali ke tanggal & jam WIB untuk form edit", () => {
+    const instant = new Date("2026-10-19T22:00:00.000Z");
+    expect(toClubDateInput(instant)).toBe("2026-10-20");
+    expect(toClubTimeInput(instant)).toBe("05:00");
+  });
+
+  it("nama hari mengikuti WIB", () => {
+    expect(formatWeekdayDate(new Date("2026-10-19T22:00:00.000Z"))).toBe("Selasa, 20 Oktober 2026");
+  });
+
+  it("rentang satu hari WIB", () => {
+    const { start, end } = clubDayRange("2026-10-20");
+    expect(start.toISOString()).toBe("2026-10-19T17:00:00.000Z");
+    expect(end.toISOString()).toBe("2026-10-20T17:00:00.000Z");
   });
 });
