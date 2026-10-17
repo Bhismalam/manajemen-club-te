@@ -24,3 +24,21 @@ export async function writeAuditLog(db: AuditDb, entry: AuditEntry): Promise<voi
     },
   });
 }
+
+// Ringkasan perubahan untuk metadata audit: { field: { from, to } } hanya untuk nilai yang berubah.
+// Tanggal dibandingkan & ditampilkan sebagai "YYYY-MM-DD".
+export function diffForAudit(
+  before: Record<string, unknown>,
+  after: Record<string, unknown>,
+): Prisma.InputJsonObject {
+  const show = (value: unknown): string | null => {
+    if (value === null || value === undefined) return null;
+    if (value instanceof Date) return value.toISOString().slice(0, 10);
+    return String(value);
+  };
+  const diff: Record<string, { from: string | null; to: string | null }> = {};
+  for (const [key, value] of Object.entries(after)) {
+    if (show(before[key]) !== show(value)) diff[key] = { from: show(before[key]), to: show(value) };
+  }
+  return diff;
+}

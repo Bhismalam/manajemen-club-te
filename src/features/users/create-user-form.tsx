@@ -40,7 +40,13 @@ const DEFAULTS: CreateUserInput = {
   trainingGroupId: "",
 };
 
-export function CreateUserForm({ groups }: { groups: GroupOption[] }) {
+export function CreateUserForm({
+  groups,
+  initialRole,
+}: {
+  groups: GroupOption[];
+  initialRole: CreateUserInput["role"];
+}) {
   const router = useRouter();
   const [created, setCreated] = useState<{
     userId: string;
@@ -56,7 +62,7 @@ export function CreateUserForm({ groups }: { groups: GroupOption[] }) {
     formState: { errors, isSubmitting },
   } = useForm<CreateUserInput>({
     resolver: zodResolver(createUserSchema),
-    defaultValues: DEFAULTS,
+    defaultValues: { ...DEFAULTS, role: initialRole },
   });
   const role = useWatch({ control, name: "role" });
 

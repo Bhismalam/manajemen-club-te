@@ -15,7 +15,7 @@ export function StatusBadge({ tone, children }: { tone: StatusTone; children: Re
   return (
     <span
       className={cn(
-        "inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium whitespace-nowrap",
+        "inline-flex h-6 w-fit items-center gap-1.5 rounded-full px-2.5 text-xs font-medium whitespace-nowrap",
         TONE_CLASS[tone],
       )}
     >

@@ -126,13 +126,14 @@ Route contoh:
 ### Admin
 
 - `/admin`
-- `/admin/athletes`
-- `/admin/coaches`
+- `/admin/users`, `/admin/users/new` (`?role=COACH|ATHLETE|ADMIN`), `/admin/users/[id]`
+- `/admin/athletes`, `/admin/athletes/[id]`
+- `/admin/coaches`, `/admin/coaches/[id]`
+- `/admin/groups`, `/admin/groups/new`, `/admin/groups/[id]`
 - `/admin/training`
 - `/admin/competitions`
 - `/admin/competitions/[id]` (detail, nomor lomba, PDF, periode pendaftaran)
 - `/admin/competitions/[id]/registrations` (rekap pendaftar + download)
-- `/admin/users`
 
 ### Coach
 
@@ -186,6 +187,8 @@ Service layer:
 - `PersonalBestService`
 - `CompetitionService`
 - `CompetitionRegistrationService`
+- `UserAdminService` (`user-admin-service.ts`: buat akun + profil lewat API admin Better Auth, status/role)
+- `TrainingGroupService`
 - `ExportService` (xlsx via `exceljs`, PDF via `@react-pdf/renderer`, keduanya di server)
 - `NotificationService`
 - `StorageService` (upload + signed URL)

@@ -84,6 +84,13 @@ Perlindungan:
 - Audit log: `mfa.enabled`, `mfa.disabled`, `mfa.backup_codes_regenerated`, `mfa.reset`. Percobaan gagal tidak dicatat per request; jejaknya ada di `failedVerificationCount`/`lockedUntil`.
 - Belum diverifikasi: apakah kode TOTP yang sama bisa dipakai dua kali dalam window 30 detik (dicatat di TASK Phase 15).
 
+### 2.2 Pembuatan akun
+
+- Hanya admin yang membuat akun (pendaftaran publik dimatikan). Akun dibuat lewat API admin Better Auth dengan session admin, jadi Better Auth ikut memeriksa izin.
+- Password awal: 12 karakter acak kriptografis tanpa karakter ambigu, **ditampilkan sekali** ke admin untuk diserahkan langsung. Tidak disimpan dalam bentuk asli dan tidak dikirim lewat chat/email oleh sistem.
+- Pengguna diminta mengganti password di Keamanan akun; mengganti password mencabut sesi di perangkat lain.
+- Menonaktifkan/menangguhkan akun memakai `banUser` Better Auth (semua sesi langsung dicabut) dan wajib disertai alasan (tercatat di audit log).
+
 ## 3. Authorization
 
 Gunakan RBAC + ownership check.
@@ -254,9 +261,10 @@ Secret production disimpan di deployment platform.
 
 Catat:
 
-- user creation.
-- role change.
-- user deactivate.
+- user creation (`user.created`), edit (`user.updated`).
+- role change (`user.role_changed`).
+- user deactivate/activate (`user.status_changed`, dengan alasan).
+- edit profil atlet/pelatih (`athlete.updated`, `coach.updated`) dan kelompok latihan (`training_group.*`), termasuk pergantian pelatih kelompok.
 - race result update.
 - PB manual correction.
 - MFA enabled / disabled / reset.

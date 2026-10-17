@@ -61,3 +61,44 @@ export function checkAthleteDates(
     });
   }
 }
+
+export const updateAthleteSchema = z
+  .object({
+    athleteId: z.string().min(1),
+    fullName: z
+      .string()
+      .trim()
+      .min(2, "Nama minimal 2 karakter.")
+      .max(100, "Nama maksimal 100 karakter."),
+    ...athleteProfileFields,
+    isActive: z.boolean(),
+  })
+  .superRefine((data, ctx) => checkAthleteDates(data, ctx));
+export type UpdateAthleteInput = z.infer<typeof updateAthleteSchema>;
+
+export const updateCoachSchema = z.object({
+  coachId: z.string().min(1),
+  fullName: z
+    .string()
+    .trim()
+    .min(2, "Nama minimal 2 karakter.")
+    .max(100, "Nama maksimal 100 karakter."),
+  ...coachProfileFields,
+  isActive: z.boolean(),
+});
+export type UpdateCoachInput = z.infer<typeof updateCoachSchema>;
+
+// Filter daftar dari query string.
+export const athleteListFilterSchema = z.object({
+  q: z.string().trim().max(100).catch(""),
+  group: z.string().trim().max(64).catch(""),
+  status: z.enum(["active", "inactive"]).optional().catch(undefined),
+  page: z.coerce.number().int().min(1).max(10_000).catch(1),
+});
+export type AthleteListFilter = z.infer<typeof athleteListFilterSchema>;
+
+export const coachListFilterSchema = z.object({
+  q: z.string().trim().max(100).catch(""),
+  status: z.enum(["active", "inactive"]).optional().catch(undefined),
+});
+export type CoachListFilter = z.infer<typeof coachListFilterSchema>;

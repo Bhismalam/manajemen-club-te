@@ -99,18 +99,22 @@ Gunakan:
 
 ## PHASE 5 — Admin
 
-- [ ] Admin overview.
-- [ ] User list.
-- [ ] Create user.
-- [ ] Edit user.
-- [ ] Activate/deactivate user (set `status` + `banned` bersamaan).
-- [ ] Tombol reset MFA di detail user (pakai `resetUserMfaAction`).
-- [ ] Saat role diubah menjadi ADMIN: panggil `revokeTrustedDevices()`.
-- [ ] Athlete list.
-- [ ] Athlete detail.
-- [ ] Coach list.
-- [ ] Coach detail.
-- [ ] Training groups.
+- [x] Admin overview (StatCard: atlet, pelatih, kelompok, akun nonaktif).
+- [x] User list (cari, filter role/status, paginasi).
+- [x] Create user (akun + profil atlet/pelatih sekaligus, password awal acak ditampilkan sekali).
+- [x] Edit user (nama, email login).
+- [x] Activate/deactivate user (set `status` + `banned` bersamaan, alasan wajib, sesi dicabut).
+- [x] Tombol reset MFA di detail user (pakai `resetUserMfaAction`).
+- [x] Ubah role (wajib punya profil yang sesuai; ke ADMIN → `revokeTrustedDevices()`).
+- [x] Proteksi: tidak bisa mengubah akun sendiri; admin aktif terakhir tidak bisa dinonaktifkan/diubah role.
+- [x] Ganti password di Keamanan akun (untuk password awal dari admin).
+- [x] Athlete list (cari nama/nomor, filter kelompok/status, paginasi).
+- [x] Athlete detail + edit profil (nama tersinkron ke akun).
+- [x] Coach list.
+- [x] Coach detail + edit profil.
+- [x] Training groups (CRUD, pilih pelatih, hapus hanya jika kosong).
+- [ ] Riwayat performa di detail atlet (menunggu Phase 8–12).
+- [ ] Soft delete pengguna/atlet/pelatih (saat ini cukup dinonaktifkan).
 
 ## PHASE 6 — Training
 

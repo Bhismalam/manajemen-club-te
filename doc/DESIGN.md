@@ -83,7 +83,7 @@ Sumber tunggal: `src/components/dashboard/nav-config.ts` (`ROLE_NAV`). Label mem
 
 ### Admin (`/admin`)
 
-Ringkasan · Atlet · Pelatih · Latihan · Absensi · Event · Hasil Lomba · Pengguna
+Ringkasan · Atlet · Pelatih · Kelompok Latihan · Latihan · Absensi · Event · Hasil Lomba · Pengguna
 
 ### Coach (`/coach`)
 
@@ -115,7 +115,9 @@ Sudah tersedia (pakai ulang, jangan buat duplikat):
 | `BrandMark`                                                                                                                                                              | `src/components/dashboard/brand-mark.tsx`      |
 | shadcn/ui: button, input, label, field, card, alert, checkbox, input-otp, breadcrumb, dropdown-menu, avatar, skeleton, empty, sidebar, sheet, tooltip, separator, sonner | `src/components/ui/`                           |
 
-Belum dibuat (menyusul sesuai fase): StatCard, AthleteCard, CoachCard, DataTable, FilterBar, StatusBadge, PerformanceChart, PersonalBestCard, RaceResultCard, EvaluationCard, ConfirmDialog, FormModal, EventCard, DisciplinePicker, RegistrationTable, ExportMenu.
+Komponen bersama tambahan (Phase 5): `ConfirmDialog` (konfirmasi aksi penting, opsional input alasan), `StatusBadge` (titik + teks, tone success/warning/danger/info/neutral), `StatCard`, `PaginationLinks` (paginasi berbasis query string) di `src/components/shared/`. Filter daftar memakai `<form method="get">` + `NativeSelect` agar filter tercermin di URL.
+
+Belum dibuat (menyusul sesuai fase): AthleteCard, CoachCard, PerformanceChart, PersonalBestCard, RaceResultCard, EvaluationCard, FormModal, EventCard, DisciplinePicker, RegistrationTable, ExportMenu.
 
 ## 8. Dashboard Admin
 
