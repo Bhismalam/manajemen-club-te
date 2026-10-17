@@ -140,22 +140,23 @@ Gunakan:
 
 ## PHASE 8 — Time Trial
 
-- [ ] Time trial list.
-- [ ] Create time trial.
-- [ ] Athlete selector.
-- [ ] Discipline selector.
-- [ ] Duration input.
-- [ ] Validate duration.
-- [ ] Time formatter.
-- [ ] PB comparison.
-- [ ] Update PB automatically.
+- [x] Time trial list (admin, coach: binaan; atlet: `/athlete/time-trials` miliknya; filter atlet/nomor, badge PB).
+- [x] Create time trial (batch: satu nomor lomba, banyak atlet; opsional terhubung ke sesi latihan).
+- [x] Athlete selector (hanya atlet aktif yang boleh dicatat; "isi atlet dari kelompok sesi").
+- [x] Discipline selector (dikelompokkan Renang / Finswimming).
+- [x] Duration input (`58.27`, `1:05.32`, koma diterima, pratinjau langsung).
+- [x] Validate duration (> 0, < 1 jam, maks. 2 desimal, detik < 60).
+- [x] Time formatter (`src/lib/duration.ts`).
+- [x] PB comparison (hasil simpan menandai PB baru + selisih).
+- [x] Update PB automatically (PB dihitung ulang dari semua hasil; edit/hapus PB ikut benar).
+- [x] Koreksi & hapus time trial (detail).
 
 ## PHASE 9 — Personal Best
 
 - [ ] PB list athlete.
 - [ ] PB detail.
 - [ ] PB dashboard card.
-- [ ] PB history strategy.
+- [x] PB history strategy: riwayat = semua time trial & hasil lomba; tabel `personal_best` hanya menyimpan nilai terbaik saat ini (dihitung ulang).
 - [ ] Highlight new PB.
 
 ## PHASE 10 — Competition

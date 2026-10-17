@@ -45,6 +45,7 @@ export const ROLE_NAV: Record<UserRole, RoleNav> = {
       { href: "/admin/groups", label: "Kelompok Latihan", icon: UsersRound },
       { href: "/admin/training", label: "Latihan", icon: Waves },
       { href: "/admin/attendance", label: "Absensi", icon: CalendarCheck },
+      { href: "/admin/time-trials", label: "Time Trial", icon: Timer },
       { href: "/admin/competitions", label: "Event", icon: Trophy },
       { href: "/admin/results", label: "Hasil Lomba", icon: Medal },
       { href: "/admin/users", label: "Pengguna", icon: ShieldUser },

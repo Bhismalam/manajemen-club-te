@@ -132,6 +132,7 @@ Route contoh:
 - `/admin/groups`, `/admin/groups/new`, `/admin/groups/[id]`
 - `/admin/training`, `/admin/training/new`, `/admin/training/[id]` (termasuk pencatatan absensi)
 - `/admin/attendance` (rekap)
+- `/admin/time-trials`, `/admin/time-trials/new`, `/admin/time-trials/[id]`
 - `/admin/competitions`
 - `/admin/competitions/[id]` (detail, nomor lomba, PDF, periode pendaftaran)
 - `/admin/competitions/[id]/registrations` (rekap pendaftar + download)
@@ -143,7 +144,7 @@ Route contoh:
 - `/coach/attendance` (rekap)
 - `/coach/attendance`
 - `/coach/athletes`
-- `/coach/time-trials`
+- `/coach/time-trials`, `/coach/time-trials/new`, `/coach/time-trials/[id]`
 - `/coach/competitions`
 - `/coach/competitions/[id]/register` (daftarkan atlet binaan)
 - `/coach/evaluations`
@@ -155,6 +156,7 @@ Route contoh:
 - `/athlete/schedule`
 - `/athlete/events` (event yang membuka pendaftaran + status pendaftaran saya)
 - `/athlete/events/[id]` (detail, unduh PDF, pilih nomor lomba)
+- `/athlete/time-trials`
 - `/athlete/results`
 - `/athlete/personal-bests`
 - `/athlete/evaluations`
@@ -186,8 +188,8 @@ Service layer:
 - `TrainingSessionService` (`training-session-service.ts`)
 - `AttendanceService` (`attendance-service.ts`: roster sesi, simpan absensi, rekap, riwayat atlet; rumus di `src/lib/attendance.ts`)
 - `AttendanceService`
-- `TimeTrialService`
-- `PersonalBestService`
+- `TimeTrialService` (`time-trial-service.ts`, parsing waktu di `src/lib/duration.ts`)
+- `PersonalBestService` (`recomputePersonalBest`)
 - `CompetitionService`
 - `CompetitionRegistrationService`
 - `UserAdminService` (`user-admin-service.ts`: buat akun + profil lewat API admin Better Auth, status/role)
@@ -302,13 +304,14 @@ Permission tidak boleh hanya berdasarkan route. Semua kebijakan diuji di `polici
 
 ## 10. Personal Best Logic
 
-Saat hasil baru dibuat:
+PB adalah **nilai terbaik yang dihitung ulang** dari semua hasil sah atlet di satu nomor lomba, bukan hasil logika "update jika lebih cepat":
 
-1. Ambil PB lama berdasarkan athlete + event type.
-2. Bandingkan duration milliseconds.
-3. Jika belum ada PB -> create.
-4. Jika hasil baru lebih cepat -> update.
-5. Simpan referensi sumber hasil.
+1. Sumber hasil: semua `TimeTrial` + `RaceResult` berstatus `FINISHED` dengan `durationMs`.
+2. PB = waktu tercepat; jika sama, yang tercapai lebih dulu (`pickPersonalBest`, `src/lib/personal-best.ts`).
+3. `recomputePersonalBest(tx, athleteId, disciplineId)` (`src/services/personal-best-service.ts`) dipanggil di transaksi yang sama setiap kali hasil dibuat, diubah, atau dihapus. Tidak ada hasil → baris PB dihapus.
+4. `PersonalBest` menyimpan referensi sumber (`sourceType`, `sourceId`). "PB baru" = PB sesudah bersumber dari hasil ini dan lebih cepat dari PB sebelumnya (`describePbChange`).
+
+Konsekuensinya: mengoreksi atau menghapus time trial yang sedang menjadi PB otomatis menurunkan PB ke hasil terbaik berikutnya. Riwayat PB = daftar time trial & hasil lomba itu sendiri.
 
 ## 11. Time Storage
 

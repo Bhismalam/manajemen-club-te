@@ -83,7 +83,7 @@ Sumber tunggal: `src/components/dashboard/nav-config.ts` (`ROLE_NAV`). Label mem
 
 ### Admin (`/admin`)
 
-Ringkasan · Atlet · Pelatih · Kelompok Latihan · Latihan · Absensi · Event · Hasil Lomba · Pengguna
+Ringkasan · Atlet · Pelatih · Kelompok Latihan · Latihan · Absensi · Time Trial · Event · Hasil Lomba · Pengguna
 
 ### Coach (`/coach`)
 
