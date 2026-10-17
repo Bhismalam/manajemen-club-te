@@ -43,7 +43,7 @@ Deployment:
 ### 1.2 Perintah
 
 - `pnpm dev`: development server.
-- `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, atau sekaligus `pnpm check`.
+- `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm test`, atau sekaligus `pnpm check`.
 - `pnpm build`: production build.
 - `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:seed`, `pnpm db:reset`, `pnpm db:studio`.
 - `pnpm mfa:reset --email <email> --reason "..." --yes`: reset MFA darurat dari server.
@@ -153,6 +153,7 @@ Boleh:
 - Manage race result.
 - Create evaluation.
 - Mendaftarkan atlet binaan ke event (sebelum deadline).
+- Membuat event dan mengelola event buatannya sendiri (PRD §4.9.1).
 
 Tidak boleh:
 
@@ -199,6 +200,13 @@ Guard yang tersedia di `src/lib/auth/session.ts`:
 - `requireAdmin()`: **wajib** untuk semua page, Server Action, dan Route Handler admin (termasuk cek MFA). Jangan pakai `requireRole("ADMIN")` untuk area admin.
 
 Panggil guard di dalam komponen yang dibungkus `<Suspense>` (aturan `cacheComponents`), bukan di level atas layout.
+
+Untuk izin berbasis data (ownership), pakai `src/lib/permissions/`:
+
+- `requireActor()` untuk mendapatkan `Actor` (sudah termasuk cek MFA admin).
+- `requireAthleteAccess(actor, athleteId, "view" | "manage")` untuk satu resource.
+- `athleteScope(actor)` di **setiap** query daftar data atlet.
+- Tambahkan kebijakan baru sebagai fungsi murni di `policies.ts` beserta tesnya.
 
 ## 7. Database Rules
 

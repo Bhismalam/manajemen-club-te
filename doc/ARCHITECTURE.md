@@ -262,26 +262,37 @@ Guard server-side:
 
 ## 9. Authorization
 
-Gunakan policy/permission layer.
+Lapisan izin ada di `src/lib/permissions/`:
 
-Contoh:
+| File          | Isi                                                                                                                                                                                                                                                                                                                      | Akses DB |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
+| `types.ts`    | `Actor`, `AthleteRef`, `CompetitionRef`, `Decision`                                                                                                                                                                                                                                                                      | -        |
+| `policies.ts` | Kebijakan murni: `canViewAthlete`, `canManageAthletePerformance`, `canEditTimeTrial`, `canEditEvaluation`, `canManageUsers`, `canManageTrainingGroup`, `canCreateCompetition`, `canManageCompetition`, `canViewCompetition`, `isRegistrationOpen`, `canRegisterAthlete`, `canViewRegistration`, `canExportRegistrations` | Tidak    |
+| `scopes.ts`   | `athleteScope(actor)`: filter Prisma untuk semua query daftar data atlet                                                                                                                                                                                                                                                 | Tidak    |
+| `actor.ts`    | `requireActor(...roles)`: session → `Actor` (+ ID profil atlet/pelatih); admin tanpa MFA diarahkan ke setup                                                                                                                                                                                                              | Ya       |
+| `guards.ts`   | Ownership guard: `requireAthleteAccess`, `requireTimeTrialEditAccess` (ambil fakta dari DB, lempar `AppError`)                                                                                                                                                                                                           | Ya       |
 
-```text
-canViewAthlete(currentUser, athleteId)
-canEditTimeTrial(currentUser, timeTrialId)
-canManageUsers(currentUser)
-canRegisterAthlete(currentUser, athleteId, competition)
-canViewRegistrations(currentUser, competitionId)
-canExportRegistrations(currentUser)
+Pola pemakaian di Server Action / service:
+
+```ts
+const actor = await requireActor(); // 1. login, role, MFA admin
+await requireAthleteAccess(actor, athleteId, "manage"); // 2. ownership single resource
+const rows = await prisma.timeTrial.findMany({
+  // 3. list: selalu pakai scope
+  where: { athlete: athleteScope(actor) },
+});
 ```
 
-Aturan pendaftaran event:
+Aturan inti:
 
-- `canRegisterAthlete`: ATHLETE hanya untuk dirinya sendiri; COACH hanya untuk atlet di training group miliknya; ADMIN untuk semua atlet. Setelah deadline, hanya ADMIN.
-- `canViewRegistrations`: ADMIN semua; COACH hanya registration atlet binaannya; ATHLETE hanya miliknya.
-- `canExportRegistrations`: hanya ADMIN.
+- Atlet binaan coach = atlet di `TrainingGroup` dengan `coachId` = profil coach tersebut. Coach tanpa profil aktif tidak punya atlet binaan.
+- Atlet tidak pernah boleh mengubah data performanya sendiri; hanya admin dan coach pembina.
+- `canRegisterAthlete` mengembalikan `Decision` dengan alasan (`FORBIDDEN`, `ATHLETE_INACTIVE`, `COMPETITION_NOT_OPEN`, `REGISTRATION_CLOSED`). Atlet/coach hanya saat event `UPCOMING` dan dalam periode pendaftaran; admin juga setelah deadline dan saat `ONGOING`. Izin dicek sebelum status atlet agar tidak membocorkan info atlet lain.
+- Event: admin dan coach boleh membuat; coach hanya mengelola event buatannya; event `DRAFT` hanya terlihat oleh pengelolanya.
+- Export rekap pendaftar: hanya admin.
+- Error memakai `AppError` (`src/lib/errors.ts`) dan bentuk respons `ActionResult` (`ok` / `fail`).
 
-Permission tidak boleh hanya berdasarkan route.
+Permission tidak boleh hanya berdasarkan route. Semua kebijakan diuji di `policies.test.ts` dan `scopes.test.ts` (`pnpm test`).
 
 ## 10. Personal Best Logic
 

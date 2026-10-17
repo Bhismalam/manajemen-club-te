@@ -76,12 +76,13 @@ Gunakan:
 
 ## PHASE 3 — Authorization
 
-- [ ] Create role guard.
-- [ ] Create ownership guard.
-- [ ] Create permission helpers.
-- [ ] Test admin permission.
-- [ ] Test coach permission.
-- [ ] Test athlete permission.
+- [x] Create role guard (`requireUser`, `requireRole`, `requireAdmin`, `requireActor`).
+- [x] Create ownership guard (`requireAthleteAccess`, `requireTimeTrialEditAccess`, `athleteScope`).
+- [x] Create permission helpers (`src/lib/permissions/policies.ts`).
+- [x] Setup Vitest (`pnpm test`, ikut di `pnpm check`).
+- [x] Test admin permission.
+- [x] Test coach permission.
+- [x] Test athlete permission.
 
 ## PHASE 4 — Dashboard Layout
 
