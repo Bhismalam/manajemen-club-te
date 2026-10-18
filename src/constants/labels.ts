@@ -1,4 +1,11 @@
-import type { AttendanceStatus, Gender, UserRole, UserStatus } from "@/generated/prisma/enums";
+import type {
+  AttendanceStatus,
+  CompetitionLevel,
+  CompetitionStatus,
+  Gender,
+  UserRole,
+  UserStatus,
+} from "@/generated/prisma/enums";
 
 // Label tampilan untuk enum database (Bahasa Indonesia).
 
@@ -24,4 +31,20 @@ export const ATTENDANCE_LABEL: Record<AttendanceStatus, string> = {
   PERMISSION: "Izin",
   SICK: "Sakit",
   ABSENT: "Tidak hadir",
+};
+
+export const COMPETITION_LEVEL_LABEL: Record<CompetitionLevel, string> = {
+  CLUB: "Klub",
+  REGIONAL: "Kab/Kota",
+  PROVINCIAL: "Provinsi",
+  NATIONAL: "Nasional",
+  INTERNATIONAL: "Internasional",
+};
+
+export const COMPETITION_STATUS_LABEL: Record<CompetitionStatus, string> = {
+  DRAFT: "Draft",
+  UPCOMING: "Akan datang",
+  ONGOING: "Berlangsung",
+  COMPLETED: "Selesai",
+  CANCELLED: "Dibatalkan",
 };

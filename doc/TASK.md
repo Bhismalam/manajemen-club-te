@@ -164,14 +164,17 @@ Gunakan:
 
 ## PHASE 10 — Competition
 
-- [ ] Competition list.
-- [ ] Competition detail.
-- [ ] Create competition (deskripsi, periode pendaftaran, maxEntriesPerAthlete).
-- [ ] Edit competition.
-- [ ] Pilih nomor lomba yang dibuka (CompetitionDiscipline).
-- [ ] Upload PDF event ke bucket privat (validasi MIME + magic bytes, maks 10 MB).
-- [ ] Download PDF via signed URL setelah cek permission.
-- [ ] Publish event (DRAFT → UPCOMING).
+- [x] Competition list (admin semua; pelatih event terbit + draft buatannya; cari & filter status).
+- [x] Competition detail (ringkasan, PDF, panel status; read-only untuk yang bukan pengelola).
+- [x] Create competition (deskripsi, periode pendaftaran jam WITA, maxEntriesPerAthlete). Event baru selalu DRAFT.
+- [x] Edit competition (admin, atau pelatih pembuat event; event selesai/batal tidak bisa diubah).
+- [x] Pilih nomor lomba yang dibuka (CompetitionDiscipline); nomor yang sudah punya pendaftar terkunci.
+- [x] Supabase Storage: `src/lib/storage/supabase.ts` (server-only, service role), `pnpm storage:setup` (bucket `private-docs` & `public-media`).
+- [x] Upload PDF event ke bucket privat lewat signed upload URL (validasi nama/MIME/ukuran, lalu magic bytes `%PDF-` di server; file tidak valid dihapus). Maks 10 MB.
+- [x] Download PDF via signed URL 5 menit setelah cek permission (`/api/competitions/[id]/attachment`).
+- [x] Publish event (DRAFT → UPCOMING) dengan daftar syarat; UPCOMING → ONGOING → COMPLETED; batal; kembali ke draft hanya jika belum ada pendaftar.
+- [ ] Uji upload/unduh PDF dengan project Supabase asli (menunggu `SUPABASE_URL` & `SUPABASE_SERVICE_ROLE_KEY` di `.env.local`).
+- [ ] Bersihkan objek PDF yatim (upload yang tidak pernah dikonfirmasi) — job terjadwal, nanti.
 
 ## PHASE 10b — Event Registration
 

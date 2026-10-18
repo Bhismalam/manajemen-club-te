@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { athleteScope, manageableGroupScope, trainingSessionScope } from "./scopes";
+import {
+  athleteScope,
+  competitionScope,
+  manageableGroupScope,
+  trainingSessionScope,
+} from "./scopes";
 import type { Actor } from "./types";
 
 describe("athleteScope", () => {
@@ -71,5 +76,19 @@ describe("manageableGroupScope", () => {
     ).toEqual({
       coachId: "c1",
     });
+  });
+});
+
+describe("competitionScope", () => {
+  it("admin semua; coach event terbit + draft miliknya; atlet hanya event terbit", () => {
+    expect(
+      competitionScope({ userId: "u", role: "ADMIN", athleteId: null, coachId: null }),
+    ).toEqual({});
+    expect(
+      competitionScope({ userId: "u1", role: "COACH", athleteId: null, coachId: "c1" }),
+    ).toEqual({ OR: [{ status: { not: "DRAFT" } }, { createdById: "u1" }] });
+    expect(
+      competitionScope({ userId: "u2", role: "ATHLETE", athleteId: "a1", coachId: null }),
+    ).toEqual({ status: { not: "DRAFT" } });
   });
 });

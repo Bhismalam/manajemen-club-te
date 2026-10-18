@@ -40,6 +40,7 @@ Deployment:
 - Koneksi database dibaca dari `DATABASE_URL` di `.env.local` (oleh Next.js dan `prisma.config.ts`).
 - Waktu: timestamp UTC di DB, tampil & input dalam jam klub (WITA) lewat helper di `src/lib/format.ts` (jangan `toLocaleString` tanpa zona waktu).
 - Helper `cn()` ada di `src/lib/utils.ts` (dipakai shadcn). Jangan membuat folder `src/lib/utils/`.
+- File (PDF event, foto) disimpan di Supabase Storage lewat `src/lib/storage/supabase.ts` (server-only, `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`, jangan pakai prefix `NEXT_PUBLIC_`). Upload besar memakai signed upload URL langsung dari browser, lalu dikonfirmasi & dicek di server. Jangan menyimpan file di database atau folder lokal.
 
 ### 1.2 Perintah
 
@@ -48,6 +49,7 @@ Deployment:
 - `pnpm build`: production build.
 - `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:seed`, `pnpm db:reset`, `pnpm db:studio`.
 - `pnpm mfa:reset --email <email> --reason "..." --yes`: reset MFA darurat dari server.
+- `pnpm storage:setup`: buat/selaraskan bucket Supabase Storage (idempoten).
 
 ## 2. Coding Principles
 

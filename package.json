@@ -19,13 +19,15 @@
     "db:reset": "prisma migrate reset",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
-    "mfa:reset": "tsx scripts/reset-mfa.ts"
+    "mfa:reset": "tsx scripts/reset-mfa.ts",
+    "storage:setup": "tsx scripts/storage-setup.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
     "@hookform/resolvers": "^5.9.1",
     "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "7.10.0",
+    "@supabase/supabase-js": "2.118.0",
     "better-auth": "1.7.7",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",

@@ -32,6 +32,16 @@ export function trainingSessionScope(actor: Actor): Prisma.TrainingSessionWhereI
   }
 }
 
+// Event yang terlihat: admin semua; selain admin hanya event terbit, ditambah DRAFT buatan
+// coach itu sendiri. Sejalan dengan `canViewCompetition`.
+export function competitionScope(actor: Actor): Prisma.CompetitionWhereInput {
+  if (actor.role === "ADMIN") return {};
+  if (actor.role === "COACH") {
+    return { OR: [{ status: { not: "DRAFT" } }, { createdById: actor.userId }] };
+  }
+  return { status: { not: "DRAFT" } };
+}
+
 // Kelompok latihan yang boleh dikelola (buat/edit sesi): admin semua, coach miliknya.
 export function manageableGroupScope(actor: Actor): Prisma.TrainingGroupWhereInput {
   if (actor.role === "ADMIN") return {};

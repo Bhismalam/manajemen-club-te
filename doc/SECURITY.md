@@ -220,9 +220,12 @@ Allowed (dokumen event):
 
 - pdf, maksimal 10 MB.
 - Cek MIME `application/pdf` **dan** magic bytes `%PDF-` di awal file. Jangan hanya percaya ekstensi.
-- Hanya ADMIN/COACH yang boleh upload.
-- Disimpan di bucket privat; diunduh lewat `/api/competitions/[id]/attachment` yang mengecek permission lalu redirect ke signed URL berumur pendek.
-- Response download memakai `Content-Disposition: attachment` agar PDF tidak dirender inline dari domain aplikasi.
+- Hanya ADMIN, atau COACH pembuat event, yang boleh upload (`canManageCompetition`).
+- Upload langsung ke Supabase lewat **signed upload URL** yang dibuat server setelah cek izin; key objek dibuat server (`competitions/{id}/{uuid}.pdf`), nama asli hanya disimpan (disanitasi) sebagai nama unduhan.
+- Setelah upload, server memverifikasi key milik event tersebut, ukuran, dan magic bytes; objek yang tidak valid langsung dihapus. Bucket juga membatasi MIME & ukuran.
+- Disimpan di bucket privat; diunduh lewat `/api/competitions/[id]/attachment` yang mengecek permission lalu redirect ke signed URL 5 menit.
+- Signed URL memakai opsi `download` sehingga Storage mengirim `Content-Disposition: attachment`; PDF tidak pernah disajikan dari domain aplikasi.
+- `SUPABASE_SERVICE_ROLE_KEY` hanya di server (`import "server-only"`), tidak pernah memakai prefix `NEXT_PUBLIC_`.
 
 ## 12.1 Export Security (Excel/PDF)
 

@@ -133,8 +133,8 @@ Route contoh:
 - `/admin/training`, `/admin/training/new`, `/admin/training/[id]` (termasuk pencatatan absensi)
 - `/admin/attendance` (rekap)
 - `/admin/time-trials`, `/admin/time-trials/new`, `/admin/time-trials/[id]`
-- `/admin/competitions`
-- `/admin/competitions/[id]` (detail, nomor lomba, PDF, periode pendaftaran)
+- `/admin/competitions`, `/admin/competitions/new`
+- `/admin/competitions/[id]` (detail, nomor lomba, PDF, periode pendaftaran, status)
 - `/admin/competitions/[id]/registrations` (rekap pendaftar + download)
 
 ### Coach
@@ -145,7 +145,7 @@ Route contoh:
 - `/coach/attendance`
 - `/coach/athletes`
 - `/coach/time-trials`, `/coach/time-trials/new`, `/coach/time-trials/[id]`
-- `/coach/competitions`
+- `/coach/competitions`, `/coach/competitions/new`, `/coach/competitions/[id]` (kelola event buatan sendiri; event lain read-only)
 - `/coach/competitions/[id]/register` (daftarkan atlet binaan)
 - `/coach/evaluations`
 
@@ -190,13 +190,13 @@ Service layer:
 - `AttendanceService`
 - `TimeTrialService` (`time-trial-service.ts`, parsing waktu di `src/lib/duration.ts`)
 - `PersonalBestService` (`recomputePersonalBest`)
-- `CompetitionService`
+- `CompetitionService` (`competition-service.ts`: event, nomor lomba, status, PDF; aturan status di `src/lib/competitions.ts`)
 - `CompetitionRegistrationService`
 - `UserAdminService` (`user-admin-service.ts`: buat akun + profil lewat API admin Better Auth, status/role)
 - `TrainingGroupService`
 - `ExportService` (xlsx via `exceljs`, PDF via `@react-pdf/renderer`, keduanya di server)
 - `NotificationService`
-- `StorageService` (upload + signed URL)
+- Storage: `src/lib/storage/supabase.ts` (client Supabase server-only) + `src/lib/storage/pdf.ts` (aturan PDF, key objek)
 - `EvaluationService`
 
 ## 7. Data Access
@@ -351,6 +351,23 @@ Bucket:
 
 - `public-media`: foto publik (gallery, coach) yang memang boleh dilihat tanpa login.
 - `private-docs`: PDF event dan avatar atlet. Diakses lewat signed URL berumur pendek (mis. 5 menit) yang dibuat server setelah cek permission.
+
+Implementasi: **Supabase Storage**, diakses hanya dari server dengan `SUPABASE_SERVICE_ROLE_KEY` (tanpa prefix `NEXT_PUBLIC_`). Bucket dibuat/diselaraskan dengan `pnpm storage:setup` (`private-docs`: privat, 10 MB, `application/pdf`; `public-media`: publik, 2 MB, jpeg/png/webp). Database development tetap PostgreSQL lokal.
+
+Alur upload PDF event (file tidak melewati server aplikasi, karena body request di Vercel dibatasi ±4.5 MB):
+
+```text
+Browser -> requestAttachmentUploadAction (cek izin + nama/MIME/ukuran)
+        <- signed upload URL untuk key competitions/{competitionId}/{uuid}.pdf
+Browser -> PUT file langsung ke Supabase (progres upload)
+Browser -> confirmAttachmentUploadAction
+           server mengunduh objek, cek ukuran & magic bytes %PDF-
+           tidak valid -> objek dihapus; valid -> simpan attachmentKey/Name, hapus PDF lama, audit
+```
+
+Unduh: `GET /api/competitions/[id]/attachment` → cek `competitionScope` (DRAFT hanya pengelola) → redirect 302 ke signed URL 5 menit dengan nama file asli sebagai nama unduhan (`Cache-Control: no-store`).
+
+Tanpa env Supabase, fitur lain tetap jalan; upload menampilkan "Penyimpanan file belum dikonfigurasi."
 
 File export Excel/PDF dibuat on-the-fly saat diminta dan di-stream ke browser, **tidak** disimpan di storage.
 
