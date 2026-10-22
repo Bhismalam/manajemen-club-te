@@ -1,7 +1,6 @@
 "use client";
 
 import { Download, FileText, Upload } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -43,7 +42,6 @@ export function AttachmentCard({
   downloadHref: string;
   canManage: boolean;
 }) {
-  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [confirmRemove, setConfirmRemove] = useState(false);
@@ -84,7 +82,6 @@ export function AttachmentCard({
         return;
       }
       toast.success(confirm.message ?? "PDF disimpan.");
-      router.refresh();
     } finally {
       setProgress(null);
       if (inputRef.current) inputRef.current.value = "";
@@ -177,7 +174,6 @@ export function AttachmentCard({
                 return false;
               }
               toast.success(result.message ?? "Dihapus.");
-              router.refresh();
               return true;
             }}
           />

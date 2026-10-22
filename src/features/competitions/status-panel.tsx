@@ -1,7 +1,6 @@
 "use client";
 
 import { CircleAlert } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -71,7 +70,6 @@ export function StatusPanel({
   publishBlockers: string[];
   registrationCount: number;
 }) {
-  const router = useRouter();
   const [target, setTarget] = useState<CompetitionStatus | null>(null);
   const transitions = allowedTransitions(status);
 
@@ -143,7 +141,6 @@ export function StatusPanel({
             }
             toast.success(result.message ?? "Status diubah.");
             setTarget(null);
-            router.refresh();
             return true;
           }}
         />

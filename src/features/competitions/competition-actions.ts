@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { z } from "zod";
 
 import type { ActionResult } from "@/lib/errors";
@@ -22,6 +23,8 @@ import {
 } from "@/services/competition-service";
 
 // Admin & pelatih; kepemilikan event (coach hanya event buatannya) dicek di service.
+// Aksi yang mengubah halaman detail memanggil `refresh()`: data halaman terbaru ikut dalam
+// respons aksi yang sama, jadi UI berubah tanpa request kedua dari `router.refresh()`.
 
 const STATUS_MESSAGE = {
   DRAFT: "Event dikembalikan ke draft.",
@@ -50,6 +53,7 @@ export async function updateCompetitionAction(input: unknown): Promise<ActionRes
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
     await updateCompetition(actor, parsed.data);
+    refresh();
     return ok(undefined, "Event disimpan.");
   } catch (error) {
     return toActionError(error);
@@ -62,6 +66,7 @@ export async function setCompetitionStatusAction(input: unknown): Promise<Action
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
     await setCompetitionStatus(actor, parsed.data.competitionId, parsed.data.status);
+    refresh();
     return ok(undefined, STATUS_MESSAGE[parsed.data.status]);
   } catch (error) {
     return toActionError(error);
@@ -87,6 +92,7 @@ export async function confirmAttachmentUploadAction(input: unknown): Promise<Act
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
     await confirmAttachmentUpload(actor, parsed.data);
+    refresh();
     return ok(undefined, "PDF event disimpan.");
   } catch (error) {
     return toActionError(error);
@@ -99,6 +105,7 @@ export async function removeAttachmentAction(input: unknown): Promise<ActionResu
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
     await removeAttachment(actor, parsed.data.competitionId);
+    refresh();
     return ok(undefined, "PDF event dihapus.");
   } catch (error) {
     return toActionError(error);
