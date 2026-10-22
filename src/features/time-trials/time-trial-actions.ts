@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { z } from "zod";
 
 import type { ActionResult } from "@/lib/errors";
@@ -35,6 +36,7 @@ export async function updateTimeTrialAction(input: unknown): Promise<ActionResul
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
     const { isCurrentPb } = await updateTimeTrial(actor, parsed.data);
+    refresh();
     return ok(undefined, isCurrentPb ? "Disimpan. Ini PB atlet saat ini." : "Time trial disimpan.");
   } catch (error) {
     return toActionError(error);

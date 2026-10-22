@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -26,7 +25,6 @@ const TONE: Record<AttendanceStatus, string> = {
 
 // Pencatatan absensi satu sesi. Atlet tanpa status tidak disimpan.
 export function AttendanceForm({ sessionId, rows }: { sessionId: string; rows: RosterRow[] }) {
-  const router = useRouter();
   const initial = useMemo(
     () =>
       Object.fromEntries(
@@ -63,7 +61,6 @@ export function AttendanceForm({ sessionId, rows }: { sessionId: string; rows: R
       return;
     }
     toast.success(result.message ?? "Tersimpan.");
-    router.refresh();
   }
 
   return (

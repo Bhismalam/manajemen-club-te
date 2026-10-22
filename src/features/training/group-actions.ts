@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { z } from "zod";
 
 import type { ActionResult } from "@/lib/errors";
@@ -33,6 +34,7 @@ export async function updateTrainingGroupAction(input: unknown): Promise<ActionR
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
     await updateTrainingGroup(actor, parsed.data);
+    refresh();
     return ok(undefined, "Kelompok disimpan.");
   } catch (error) {
     return toActionError(error);

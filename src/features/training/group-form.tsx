@@ -60,7 +60,6 @@ export function GroupForm({
         toast.success(result.message ?? "Tersimpan.");
         if (groupId) {
           reset(values);
-          router.refresh();
         } else if (result.data && typeof result.data === "object" && "id" in result.data) {
           router.push(`/admin/groups/${result.data.id}`);
         }

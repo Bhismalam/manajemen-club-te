@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { z } from "zod";
 
 import { requireAdmin } from "@/lib/auth/session";
@@ -41,5 +42,6 @@ export async function resetUserMfaAction(input: unknown): Promise<ActionResult> 
     throw error;
   }
 
+  refresh();
   return ok(undefined, "MFA direset. User harus login ulang dan mengaktifkan MFA kembali.");
 }

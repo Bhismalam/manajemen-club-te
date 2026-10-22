@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { z } from "zod";
 
 import type { ActionResult } from "@/lib/errors";
@@ -33,6 +34,7 @@ export async function updateTrainingSessionAction(input: unknown): Promise<Actio
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
     await updateTrainingSession(actor, parsed.data);
+    refresh();
     return ok(undefined, "Sesi latihan disimpan.");
   } catch (error) {
     return toActionError(error);

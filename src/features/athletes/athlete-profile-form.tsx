@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -25,7 +24,6 @@ export function AthleteProfileForm({
   defaults: UpdateAthleteInput;
   groups: GroupOption[];
 }) {
-  const router = useRouter();
   const {
     register,
     control,
@@ -51,7 +49,6 @@ export function AthleteProfileForm({
         }
         toast.success(result.message ?? "Tersimpan.");
         reset(values);
-        router.refresh();
       })}
     >
       <FieldGroup>

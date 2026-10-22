@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -15,7 +14,6 @@ import { updateCoachSchema } from "@/lib/validations/profiles";
 import { updateCoachAction } from "./coach-actions";
 
 export function CoachProfileForm({ defaults }: { defaults: UpdateCoachInput }) {
-  const router = useRouter();
   const {
     register,
     control,
@@ -38,7 +36,6 @@ export function CoachProfileForm({ defaults }: { defaults: UpdateCoachInput }) {
         }
         toast.success(result.message ?? "Tersimpan.");
         reset(values);
-        router.refresh();
       })}
     >
       <FieldGroup>

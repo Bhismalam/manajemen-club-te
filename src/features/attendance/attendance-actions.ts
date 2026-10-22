@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import type { ActionResult } from "@/lib/errors";
 import { ok, toActionError, validationFail } from "@/lib/errors";
 import { requireActor } from "@/lib/permissions/actor";
@@ -13,6 +14,7 @@ export async function saveAttendanceAction(input: unknown): Promise<ActionResult
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
     await saveSessionAttendance(actor, parsed.data);
+    refresh();
     return ok(undefined, "Absensi disimpan.");
   } catch (error) {
     return toActionError(error);

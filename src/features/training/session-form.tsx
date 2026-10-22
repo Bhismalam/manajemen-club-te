@@ -74,7 +74,6 @@ export function SessionForm({
         toast.success(result.message ?? "Tersimpan.");
         if (sessionId) {
           reset(values);
-          router.refresh();
         } else if (result.data && typeof result.data === "object" && "id" in result.data) {
           router.push(`${basePath}/${result.data.id}`);
         }

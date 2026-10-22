@@ -28,7 +28,6 @@ export function EditTimeTrialForm({
   defaults: FormValues;
   today: string;
 }) {
-  const router = useRouter();
   const {
     register,
     control,
@@ -50,7 +49,6 @@ export function EditTimeTrialForm({
         }
         toast.success(result.message ?? "Tersimpan.");
         reset(values);
-        router.refresh();
       })}
     >
       <FieldGroup>

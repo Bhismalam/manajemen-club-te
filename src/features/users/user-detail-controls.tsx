@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -22,24 +21,20 @@ import { updateUserAccountSchema } from "@/lib/validations/users";
 import { resetUserMfaAction } from "./mfa-actions";
 import { setUserRoleAction, setUserStatusAction, updateUserAccountAction } from "./user-actions";
 
-// Tampilkan hasil action sebagai toast; true jika berhasil.
-function useActionFeedback() {
-  const router = useRouter();
-  return (result: ActionResult) => {
-    if (!result.success) {
-      toast.error(result.error.message);
-      return false;
-    }
-    if (result.message) toast.success(result.message);
-    router.refresh();
-    return true;
-  };
+// Tampilkan hasil action sebagai toast; true jika berhasil. Data halaman diperbarui oleh
+// `refresh()` di dalam action.
+function feedback(result: ActionResult) {
+  if (!result.success) {
+    toast.error(result.error.message);
+    return false;
+  }
+  if (result.message) toast.success(result.message);
+  return true;
 }
 
 // ---------------------------------------------------------------------------
 
 export function UserAccountForm({ user }: { user: { id: string; name: string; email: string } }) {
-  const feedback = useActionFeedback();
   const {
     register,
     handleSubmit,
@@ -100,7 +95,6 @@ export function UserStatusControl({
   status: UserStatus;
   disabled: boolean;
 }) {
-  const feedback = useActionFeedback();
   const id = useId();
   const [next, setNext] = useState<UserStatus>(status);
   const [reason, setReason] = useState("");
@@ -183,7 +177,6 @@ export function UserRoleControl({
   role: UserRole;
   disabled: boolean;
 }) {
-  const feedback = useActionFeedback();
   const id = useId();
   const [next, setNext] = useState<UserRole>(role);
   const [open, setOpen] = useState(false);
@@ -235,7 +228,6 @@ export function UserRoleControl({
 // ---------------------------------------------------------------------------
 
 export function ResetMfaControl({ userId, disabled }: { userId: string; disabled: boolean }) {
-  const feedback = useActionFeedback();
   const id = useId();
   const [reason, setReason] = useState("");
   const [open, setOpen] = useState(false);

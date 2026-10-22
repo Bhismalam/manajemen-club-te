@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { headers } from "next/headers";
 
 import { requireAdmin } from "@/lib/auth/session";
@@ -41,6 +42,7 @@ export async function updateUserAccountAction(input: unknown): Promise<ActionRes
 
   try {
     await updateUserAccount(admin, parsed.data, await headers());
+    refresh();
     return ok(undefined, "Data akun disimpan.");
   } catch (error) {
     return toActionError(error);
@@ -54,6 +56,7 @@ export async function setUserStatusAction(input: unknown): Promise<ActionResult>
 
   try {
     await setUserStatus(admin, parsed.data, await headers());
+    refresh();
     return ok(undefined, "Status akun diperbarui.");
   } catch (error) {
     return toActionError(error);
@@ -67,6 +70,7 @@ export async function setUserRoleAction(input: unknown): Promise<ActionResult> {
 
   try {
     await setUserRole(admin, parsed.data, await headers());
+    refresh();
     return ok(undefined, "Role diperbarui.");
   } catch (error) {
     return toActionError(error);
