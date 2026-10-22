@@ -146,7 +146,7 @@ Route contoh:
 - `/coach/athletes`
 - `/coach/time-trials`, `/coach/time-trials/new`, `/coach/time-trials/[id]`
 - `/coach/competitions`, `/coach/competitions/new`, `/coach/competitions/[id]` (kelola event buatan sendiri; event lain read-only)
-- `/coach/competitions/[id]/register` (daftarkan atlet binaan)
+- `/coach/competitions/[id]/register` (daftarkan atlet binaan, status pendaftaran atlet binaan)
 - `/coach/evaluations`
 
 ### Athlete
@@ -180,6 +180,8 @@ Route contoh:
 
 MVP dapat menggunakan Next.js Server Actions + Route Handlers.
 
+Server Action yang mengubah data di halaman yang sedang dibuka memanggil `refresh()` dari `next/cache` setelah berhasil, sehingga data halaman terbaru ikut dalam respons aksi yang sama. Jangan memakai `router.refresh()` di client untuk hasil Server Action (request kedua, terasa lambat di `pnpm dev`). Pengecualian: alur Better Auth client (login, logout, MFA) yang tidak melalui Server Action.
+
 Service layer:
 
 - `AuthService`
@@ -191,11 +193,11 @@ Service layer:
 - `TimeTrialService` (`time-trial-service.ts`, parsing waktu di `src/lib/duration.ts`)
 - `PersonalBestService` (`recomputePersonalBest`)
 - `CompetitionService` (`competition-service.ts`: event, nomor lomba, status, PDF; aturan status di `src/lib/competitions.ts`)
-- `CompetitionRegistrationService`
+- `CompetitionRegistrationService` (`competition-registration-service.ts`: daftar/ubah/batal, board pelatih/admin, rekap `getRoster`; aturan murni di `src/lib/registrations.ts`)
 - `UserAdminService` (`user-admin-service.ts`: buat akun + profil lewat API admin Better Auth, status/role)
 - `TrainingGroupService`
-- `ExportService` (xlsx via `exceljs`, PDF via `@react-pdf/renderer`, keduanya di server)
-- `NotificationService`
+- Export rekap: `src/features/exports/` (`roster-data.ts` → `roster-xlsx.ts` via `exceljs`, `roster-pdf.tsx` via `@react-pdf/renderer`), dipanggil Route Handler export
+- `NotificationService` (`notification-service.ts`: hitung belum dibaca, daftar terbaru, tandai dibaca)
 - Storage: `src/lib/storage/supabase.ts` (client Supabase server-only) + `src/lib/storage/pdf.ts` (aturan PDF, key objek)
 - `EvaluationService`
 

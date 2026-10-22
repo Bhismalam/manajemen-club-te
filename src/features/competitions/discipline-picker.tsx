@@ -10,19 +10,25 @@ import type { DisciplineOption } from "@/services/time-trial-service";
 const SPORT_LABEL: Record<SportType, string> = { SWIMMING: "Renang", FINSWIMMING: "Finswimming" };
 
 // Checkbox nomor lomba, dikelompokkan per olahraga. Nomor yang sudah punya pendaftar
-// (`lockedIds`) tidak bisa dilepas.
+// (`lockedIds`) tidak bisa dilepas. `renderMeta` menampilkan info tambahan per nomor (mis. PB).
 export function DisciplinePicker({
   options,
   value,
   onChange,
   lockedIds = [],
   invalid = false,
+  disabled = false,
+  bulkToggle = true,
+  renderMeta,
 }: {
   options: DisciplineOption[];
   value: string[];
   onChange: (value: string[]) => void;
   lockedIds?: string[];
   invalid?: boolean;
+  disabled?: boolean;
+  bulkToggle?: boolean;
+  renderMeta?: (option: DisciplineOption) => React.ReactNode;
 }) {
   const selected = new Set(value);
   const locked = new Set(lockedIds);
@@ -52,21 +58,23 @@ export function DisciplinePicker({
                   ({group.filter((option) => selected.has(option.id)).length}/{group.length})
                 </span>
               </h3>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  const ids = new Set(group.map((option) => option.id));
-                  onChange(
-                    allSelected
-                      ? value.filter((id) => !ids.has(id) || locked.has(id))
-                      : [...value, ...group.map((o) => o.id).filter((id) => !selected.has(id))],
-                  );
-                }}
-              >
-                {allSelected ? "Kosongkan" : "Pilih semua"}
-              </Button>
+              {bulkToggle && !disabled && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const ids = new Set(group.map((option) => option.id));
+                    onChange(
+                      allSelected
+                        ? value.filter((id) => !ids.has(id) || locked.has(id))
+                        : [...value, ...group.map((o) => o.id).filter((id) => !selected.has(id))],
+                    );
+                  }}
+                >
+                  {allSelected ? "Kosongkan" : "Pilih semua"}
+                </Button>
+              )}
             </div>
             <div className="grid gap-1 sm:grid-cols-2">
               {group.map((option) => {
@@ -76,19 +84,20 @@ export function DisciplinePicker({
                   <label
                     key={option.id}
                     htmlFor={id}
-                    className="flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 text-sm hover:bg-muted/60"
+                    className={`flex min-h-10 items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${disabled ? "" : "cursor-pointer hover:bg-muted/60"}`}
                   >
                     <Checkbox
                       id={id}
                       checked={selected.has(option.id)}
                       aria-invalid={invalid}
-                      disabled={isLocked && selected.has(option.id)}
+                      disabled={disabled || (isLocked && selected.has(option.id))}
                       onCheckedChange={(checked) => toggle(option.id, checked === true)}
                     />
                     <span className="flex-1">
                       {option.name}
                       <span className="text-muted-foreground"> · {option.poolLength}m</span>
                     </span>
+                    {renderMeta?.(option)}
                     {isLocked && (
                       <span
                         className="flex items-center gap-1 text-xs text-muted-foreground"

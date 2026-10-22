@@ -270,6 +270,7 @@ Contoh:
 - Confirmation untuk destructive action.
 - Halaman dashboard baru: taruh di `src/app/{admin|coach|athlete}/...`, otomatis memakai `DashboardShell`. Mulai dengan `PageHeader`, bungkus bagian yang membaca session/data dengan `<Suspense fallback={<PageSkeleton />}>`.
 - Pakai `EmptyState`, `ErrorState`, `PageSkeleton` dari `src/components/shared/` untuk state halaman.
+- Server Action yang mengubah data memanggil `refresh()` dari `next/cache` setelah berhasil; jangan `router.refresh()` di client setelah Server Action (kecuali alur Better Auth client).
 - Menu baru ditambahkan di `src/components/dashboard/nav-config.ts`.
 - Client component yang memakai `usePathname` / `useSearchParams` wajib berada di dalam `<Suspense>` (build gagal di route dinamis jika tidak).
 - Warna lewat token (`bg-primary`, `text-muted-foreground`); aqua (`lane`/`ring`) hanya untuk item aktif & fokus.

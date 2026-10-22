@@ -1,6 +1,9 @@
+import { ClipboardList, UserPlus } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PageHeader } from "@/components/shared/page-header";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { COMPETITION_LEVEL_LABEL } from "@/constants/labels";
 import { isEditableStatus } from "@/lib/competitions";
@@ -57,6 +60,28 @@ function dateRange(start: Date, end: Date) {
     : `${formatDate(start)} – ${formatDate(end)}`;
 }
 
+// Aksi pendaftaran di header: admin ke rekap pendaftar, pelatih ke form atlet binaan.
+function RegistrationLink({ actor, competition }: { actor: Actor; competition: Competition }) {
+  if (actor.role === "ADMIN") {
+    return (
+      <Link
+        href={`/admin/competitions/${competition.id}/registrations`}
+        className={buttonVariants()}
+      >
+        <ClipboardList />
+        Pendaftar ({competition._count.registrations})
+      </Link>
+    );
+  }
+  if (competition.status !== "UPCOMING" && competition.status !== "ONGOING") return null;
+  return (
+    <Link href={`/coach/competitions/${competition.id}/register`} className={buttonVariants()}>
+      <UserPlus />
+      Daftarkan atlet binaan
+    </Link>
+  );
+}
+
 // Detail event untuk admin & pelatih. Form edit hanya untuk pengelola (admin / pembuat event).
 export async function CompetitionDetail({
   actor,
@@ -80,6 +105,7 @@ export async function CompetitionDetail({
       <PageHeader
         title={competition.name}
         description={`${dateRange(competition.startDate, competition.endDate)} · ${competition.location}`}
+        actions={<RegistrationLink actor={actor} competition={competition} />}
       />
 
       <div className="grid gap-6 lg:grid-cols-3">

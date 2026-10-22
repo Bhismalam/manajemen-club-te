@@ -178,19 +178,20 @@ Gunakan:
 
 ## PHASE 10b — Event Registration
 
-- [ ] Permission helpers: `canRegisterAthlete`, `canViewRegistrations`, `canExportRegistrations`.
-- [ ] `CompetitionRegistrationService.register()` (validasi periode, nomor lomba, status atlet, batas entry, seed time dari PB).
-- [ ] Halaman `/athlete/events` (event terbuka + status pendaftaran saya).
-- [ ] Halaman `/athlete/events/[id]` (detail, unduh PDF, DisciplinePicker, daftar).
-- [ ] Ubah nomor lomba / batalkan pendaftaran sebelum deadline.
-- [ ] Halaman `/coach/competitions/[id]/register` (daftarkan atlet binaan).
-- [ ] Notifikasi in-app ke semua admin + badge di dashboard admin.
-- [ ] Halaman `/admin/competitions/[id]/registrations` (ringkasan, Per Atlet / Per Nomor Lomba, filter, cari).
-- [ ] Admin ubah/batalkan pendaftaran setelah deadline.
-- [ ] Export Excel (`exceljs`, sheet Per Atlet + Per Nomor Lomba, escape formula injection).
-- [ ] Export PDF (`@react-pdf/renderer`, kop event + daftar per nomor lomba).
-- [ ] Audit log: registration create/update/cancel + export.
-- [ ] Test: atlet daftarkan atlet lain, coach non-binaan, setelah deadline, event DRAFT, discipline tidak dibuka, non-admin export.
+- [x] Permission helpers: `canRegisterAthlete`, `canViewRegistration`, `canExportRegistrations` (sudah ada sejak Phase 3) + `competitionScope`.
+- [x] `competition-registration-service.ts`: `saveRegistration` (validasi periode, nomor lomba dibuka, status atlet, batas entry, seed time = snapshot PB), `cancelRegistration`, daftar ulang setelah batal, nomor dengan hasil lomba tidak bisa dihapus.
+- [x] Halaman `/athlete/events` (event terbit, deadline terdekat dulu, badge "Pendaftaran dibuka · Tutup N hari lagi" / "Terdaftar").
+- [x] Halaman `/athlete/events/[id]` (info event, unduh PDF, DisciplinePicker + PB per nomor, daftar). athleteId selalu dari session.
+- [x] Ubah nomor lomba / batalkan pendaftaran sebelum deadline (ConfirmDialog); setelah deadline read-only + "Hubungi admin".
+- [x] Halaman `/coach/competitions/[id]/register` (pilih atlet binaan, daftar atlet binaan terdaftar); tombol di detail event.
+- [x] Notifikasi in-app ke semua admin aktif (kecuali pelaku) + kartu "Pendaftaran baru" & daftar notifikasi di ringkasan admin; dibaca otomatis saat rekap event dibuka, atau "Tandai semua dibaca".
+- [x] Halaman `/admin/competitions/[id]/registrations` (ringkasan, Per Atlet / Per Nomor Lomba, filter nomor & jenis kelamin, cari, tampilkan yang dibatalkan).
+- [x] Admin daftarkan/ubah/batalkan pendaftaran kapan saja selama event UPCOMING/ONGOING (form di halaman rekap, ikon ubah per baris).
+- [x] Export Excel (`exceljs`, sheet Per Atlet + Per Nomor Lomba, header beku + autofilter, escape formula injection).
+- [x] Export PDF (`@react-pdf/renderer`, kop event + daftar per nomor lomba urut seed time, nomor halaman).
+- [x] Audit log: `competition_registration.created/updated/cancelled/exported`.
+- [x] Test: atlet daftarkan atlet lain, coach non-binaan, setelah deadline, event DRAFT, nomor tidak dibuka, batas entry, atlet nonaktif, non-admin export (uji service + E2E), plus tes unit `src/lib/registrations.ts`.
+- [x] Perbaikan lintas fitur: semua Server Action yang mengubah halaman memanggil `refresh()` (bukan `router.refresh()` di client).
 
 ## PHASE 11 — Race Result
 
