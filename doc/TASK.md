@@ -173,7 +173,7 @@ Gunakan:
 - [x] Upload PDF event ke bucket privat lewat signed upload URL (validasi nama/MIME/ukuran, lalu magic bytes `%PDF-` di server; file tidak valid dihapus). Maks 10 MB.
 - [x] Download PDF via signed URL 5 menit setelah cek permission (`/api/competitions/[id]/attachment`).
 - [x] Publish event (DRAFT → UPCOMING) dengan daftar syarat; UPCOMING → ONGOING → COMPLETED; batal; kembali ke draft hanya jika belum ada pendaftar.
-- [ ] Uji upload/unduh PDF dengan project Supabase asli (menunggu `SUPABASE_URL` & `SUPABASE_SERVICE_ROLE_KEY` di `.env.local`).
+- [x] Uji upload/unduh PDF dengan project Supabase asli (secret key `sb_secret_…`): upload tanpa apikey + CORS, unduh `Content-Disposition: attachment`, file palsu ditolak & dihapus, bucket menolak MIME lain, ganti/hapus PDF membersihkan objek lama.
 - [ ] Bersihkan objek PDF yatim (upload yang tidak pernah dikonfirmasi) — job terjadwal, nanti.
 
 ## PHASE 10b — Event Registration
