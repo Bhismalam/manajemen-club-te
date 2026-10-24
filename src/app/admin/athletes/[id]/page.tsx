@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { GENDER_LABEL, USER_STATUS_LABEL } from "@/constants/labels";
 import { AthleteProfileForm } from "@/features/athletes/athlete-profile-form";
 import { PersonalBestGrid } from "@/features/personal-bests/personal-best-card";
+import { RaceHistory } from "@/features/race-results/race-history";
 import { userStatusTone } from "@/features/users/user-status";
 import { isAppError } from "@/lib/errors";
 import { ageOn, formatDate, toDateInputValue } from "@/lib/format";
@@ -17,6 +18,7 @@ import { requireActor } from "@/lib/permissions/actor";
 import type { Actor } from "@/lib/permissions/types";
 import { getAthleteDetail } from "@/services/athlete-service";
 import { listPersonalBests } from "@/services/personal-best-service";
+import { listAthleteRaceHistory } from "@/services/race-result-service";
 import { listTrainingGroupOptions } from "@/services/training-group-service";
 
 export const metadata: Metadata = { title: "Detail Atlet" };
@@ -41,10 +43,11 @@ async function loadAthlete(actor: Actor, id: string) {
 async function AthleteDetail({ params }: { params: PageProps<"/admin/athletes/[id]">["params"] }) {
   const actor = await requireActor("ADMIN");
   const { id } = await params;
-  const [athlete, groups, pbs] = await Promise.all([
-    loadAthlete(actor, id),
+  const athlete = await loadAthlete(actor, id);
+  const [groups, pbs, history] = await Promise.all([
     listTrainingGroupOptions(),
     listPersonalBests(id),
+    listAthleteRaceHistory(id),
   ]);
 
   return (
@@ -137,6 +140,14 @@ async function AthleteDetail({ params }: { params: PageProps<"/admin/athletes/[i
                 `/admin/athletes/${athlete.id}/personal-bests/${disciplineId}`
               }
               emptyDescription={`${athlete._count.timeTrials} time trial tercatat. PB muncul setelah ada time trial atau hasil lomba.`}
+            />
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-lg font-semibold">Riwayat lomba</h2>
+            <RaceHistory
+              history={history}
+              emptyDescription="Hasil lomba atlet ini akan muncul setelah dicatat di menu Hasil Lomba."
             />
           </section>
         </div>

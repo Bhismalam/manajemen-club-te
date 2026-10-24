@@ -195,13 +195,16 @@ Gunakan:
 
 ## PHASE 11 — Race Result
 
-- [ ] Record race result.
-- [ ] Rank.
-- [ ] Medal.
-- [ ] Round.
-- [ ] DNS/DNF/DSQ support.
-- [ ] PB comparison.
-- [ ] Athlete competition history.
+- [x] Record race result: lembar input per event → per nomor lomba (`/admin/results/[id]`, `/coach/results/[id]`), simpan batch hanya baris yang berubah, status "— belum ada —" menghapus hasil.
+- [x] Rank (1–999, hanya untuk finish).
+- [x] Medal (emas/perak/perunggu; otomatis dari peringkat 1–3 di final / final langsung, bisa diubah manual).
+- [x] Round (final langsung, heat, semifinal, final; hasil per entry + babak).
+- [x] DNS/DNF/DSQ support (tanpa waktu, peringkat, dan medali; tidak memengaruhi PB).
+- [x] PB comparison: PB dihitung ulang dari time trial + hasil FINISHED (`recomputePersonalBest`), toast "PB baru", selisih terhadap seed time (PB saat mendaftar), badge PB.
+- [x] Athlete competition history: `/athlete/results` + bagian "Riwayat lomba" di detail atlet admin, rekap medali.
+- [x] Aturan: hasil hanya untuk entry pendaftaran aktif; event berlangsung/selesai (atau akan datang yang tanggal mulainya sudah tiba); pelatih hanya atlet binaan; pendaftaran yang punya hasil tidak bisa dibatalkan.
+- [x] Audit `race_result.saved` (per batch, berisi perubahan per entry).
+- [x] Token warna medali `gold` / `silver` / `bronze` (light & dark).
 
 ## PHASE 12 — Coach Evaluation
 

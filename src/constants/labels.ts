@@ -3,6 +3,9 @@ import type {
   CompetitionLevel,
   CompetitionStatus,
   Gender,
+  Medal,
+  ResultStatus,
+  Round,
   UserRole,
   UserStatus,
 } from "@/generated/prisma/enums";
@@ -47,4 +50,25 @@ export const COMPETITION_STATUS_LABEL: Record<CompetitionStatus, string> = {
   ONGOING: "Berlangsung",
   COMPLETED: "Selesai",
   CANCELLED: "Dibatalkan",
+};
+
+export const RESULT_STATUS_LABEL: Record<ResultStatus, string> = {
+  FINISHED: "Finish",
+  DNS: "DNS (tidak start)",
+  DNF: "DNF (tidak finish)",
+  DSQ: "DSQ (diskualifikasi)",
+};
+
+export const ROUND_LABEL: Record<Round, string> = {
+  TIME_FINAL: "Final langsung",
+  HEAT: "Heat",
+  SEMIFINAL: "Semifinal",
+  FINAL: "Final",
+};
+
+export const MEDAL_LABEL: Record<Medal, string> = {
+  NONE: "Tanpa medali",
+  GOLD: "Emas",
+  SILVER: "Perak",
+  BRONZE: "Perunggu",
 };

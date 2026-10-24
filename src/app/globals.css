@@ -13,6 +13,9 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-info: var(--info);
+  --color-gold: var(--gold);
+  --color-silver: var(--silver);
+  --color-bronze: var(--bronze);
   --color-lane: var(--lane);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -75,6 +78,10 @@
   --success: #1f8a5b;
   --warning: #a76a12;
   --info: #0b6fa4;
+  /* Medali hasil lomba (teks; latar = warna yang sama dengan opacity rendah). */
+  --gold: #8a6a00;
+  --silver: #4b5866;
+  --bronze: #8a4b16;
   --border: #dce5ec;
   --input: #cfdae3;
   --ring: #2ec4d6;
@@ -115,6 +122,9 @@
   --success: #4cc28b;
   --warning: #e0a443;
   --info: #3ea3d8;
+  --gold: #f2cf5b;
+  --silver: #c9d2db;
+  --bronze: #e3a36b;
   --border: #1f3850;
   --input: #27455f;
   --ring: #2ec4d6;

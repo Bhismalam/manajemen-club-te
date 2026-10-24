@@ -136,6 +136,7 @@ Route contoh:
 - `/admin/competitions`, `/admin/competitions/new`
 - `/admin/competitions/[id]` (detail, nomor lomba, PDF, periode pendaftaran, status)
 - `/admin/competitions/[id]/registrations` (rekap pendaftar + download)
+- `/admin/results`, `/admin/results/[id]` (input hasil lomba per event, `?round=&discipline=`)
 
 ### Coach
 
@@ -147,6 +148,7 @@ Route contoh:
 - `/coach/time-trials`, `/coach/time-trials/new`, `/coach/time-trials/[id]`
 - `/coach/competitions`, `/coach/competitions/new`, `/coach/competitions/[id]` (kelola event buatan sendiri; event lain read-only)
 - `/coach/competitions/[id]/register` (daftarkan atlet binaan, status pendaftaran atlet binaan)
+- `/coach/results`, `/coach/results/[id]` (hasil lomba atlet binaan)
 - `/coach/evaluations`
 
 ### Athlete
@@ -157,7 +159,7 @@ Route contoh:
 - `/athlete/events` (event yang membuka pendaftaran + status pendaftaran saya)
 - `/athlete/events/[id]` (detail, unduh PDF, pilih nomor lomba)
 - `/athlete/time-trials`
-- `/athlete/results`
+- `/athlete/results` (riwayat lomba, medali, selisih terhadap seed time)
 - `/athlete/personal-bests`, `/athlete/personal-bests/[disciplineId]`
 - `/athlete/evaluations`
 
@@ -193,6 +195,7 @@ Service layer:
 - `TimeTrialService` (`time-trial-service.ts`, parsing waktu di `src/lib/duration.ts`)
 - `PersonalBestService` (`recomputePersonalBest`)
 - `CompetitionService` (`competition-service.ts`: event, nomor lomba, status, PDF; aturan status di `src/lib/competitions.ts`)
+- `RaceResultService` (`race-result-service.ts`: daftar event, lembar hasil, `saveResults` batch + hitung ulang PB, riwayat atlet; aturan murni di `src/lib/race-results.ts`)
 - `CompetitionRegistrationService` (`competition-registration-service.ts`: daftar/ubah/batal, board pelatih/admin, rekap `getRoster`; aturan murni di `src/lib/registrations.ts`)
 - `UserAdminService` (`user-admin-service.ts`: buat akun + profil lewat API admin Better Auth, status/role)
 - `TrainingGroupService`

@@ -87,7 +87,7 @@ Ringkasan · Atlet · Pelatih · Kelompok Latihan · Latihan · Absensi · Time 
 
 ### Coach (`/coach`)
 
-Ringkasan · Atlet Binaan · Latihan · Absensi · Time Trial · Event · Evaluasi
+Ringkasan · Atlet Binaan · Latihan · Absensi · Time Trial · Event · Hasil Lomba · Evaluasi
 
 ### Athlete (`/athlete`)
 
@@ -121,7 +121,9 @@ Komponen Phase 6–9: `AttendanceForm` (pill radio per atlet), `PersonalBestCard
 
 Komponen event (Phase 10/10b): `DisciplinePicker` (`features/competitions`, checkbox per olahraga, opsi `renderMeta` untuk PB, `disabled`, nomor terkunci), `RegistrationEditor` (form pendaftaran mode atlet sendiri / pelatih-admin), `EventSummary` + `RegistrationWindowBadge`, `RosterView` (Per Atlet / Per Nomor Lomba), `ExportMenu` (unduh dengan loading), `NotificationList` di `features/competition-registrations`.
 
-Belum dibuat (menyusul sesuai fase): AthleteCard, CoachCard, RaceResultCard, EvaluationCard, FormModal.
+Komponen hasil lomba (Phase 11): `DisciplineResultForm` (lembar input per nomor; tabel di desktop, kartu di mobile), `ResultEventList`, `RaceHistory` (riwayat + rekap medali) di `features/race-results`. Medali memakai token `gold` / `silver` / `bronze` (`bg-gold/15 text-gold`).
+
+Belum dibuat (menyusul sesuai fase): AthleteCard, CoachCard, EvaluationCard, FormModal.
 
 ## 8. Dashboard Admin
 
