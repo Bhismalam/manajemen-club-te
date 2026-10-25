@@ -12,8 +12,11 @@ import {
   setUserStatusSchema,
   updateUserAccountSchema,
 } from "@/lib/validations/users";
+import { z } from "zod";
+
 import {
   createUser,
+  resetUserPassword,
   setUserRole,
   setUserStatus,
   updateUserAccount,
@@ -72,6 +75,21 @@ export async function setUserRoleAction(input: unknown): Promise<ActionResult> {
     await setUserRole(admin, parsed.data, await headers());
     refresh();
     return ok(undefined, "Role diperbarui.");
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function resetUserPasswordAction(
+  input: unknown,
+): Promise<ActionResult<{ email: string; temporaryPassword: string }>> {
+  const admin = await requireAdmin();
+  const parsed = z.object({ userId: z.string().min(1).max(64) }).safeParse(input);
+  if (!parsed.success) return validationFail(parsed.error.issues);
+  try {
+    const result = await resetUserPassword(admin, parsed.data.userId, await headers());
+    refresh();
+    return ok(result, "Password sementara dibuat.");
   } catch (error) {
     return toActionError(error);
   }

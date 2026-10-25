@@ -62,6 +62,12 @@ export const auth = betterAuth({
         required: false,
         input: false,
       },
+      mustChangePassword: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
     },
   },
   databaseHooks: {
@@ -138,16 +144,29 @@ export const auth = betterAuth({
       }
     }),
     after: createAuthMiddleware(async (ctx) => {
-      if (ctx.path !== "/two-factor/generate-backup-codes") return;
       if (ctx.context.returned instanceof APIError) return;
       const userId = ctx.context.session?.user.id;
       if (!userId) return;
-      await writeAuditLog(prisma, {
-        actorUserId: userId,
-        action: "mfa.backup_codes_regenerated",
-        entityType: "User",
-        entityId: userId,
-      });
+
+      if (ctx.path === "/two-factor/generate-backup-codes") {
+        await writeAuditLog(prisma, {
+          actorUserId: userId,
+          action: "mfa.backup_codes_regenerated",
+          entityType: "User",
+          entityId: userId,
+        });
+      }
+
+      // Password awal dari admin sudah diganti sendiri: kewajiban ganti password selesai.
+      if (ctx.path === "/change-password") {
+        await prisma.user.update({ where: { id: userId }, data: { mustChangePassword: false } });
+        await writeAuditLog(prisma, {
+          actorUserId: userId,
+          action: "user.password_changed",
+          entityType: "User",
+          entityId: userId,
+        });
+      }
     }),
   },
   rateLimit: {

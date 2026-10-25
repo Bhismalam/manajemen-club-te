@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ROLE_LABEL, USER_STATUS_LABEL } from "@/constants/labels";
 import {
   ResetMfaControl,
+  ResetPasswordControl,
   UserAccountForm,
   UserRoleControl,
   UserStatusControl,
@@ -127,6 +128,22 @@ async function UserDetail({ params }: { params: PageProps<"/admin/users/[id]">["
             <CardContent className="flex flex-col gap-6">
               <UserStatusControl userId={user.id} status={user.status} disabled={isSelf} />
               <UserRoleControl userId={user.id} role={user.role} disabled={isSelf} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Password</CardTitle>
+              <CardDescription>
+                {isSelf
+                  ? "Ganti password akunmu sendiri di menu Keamanan."
+                  : user.mustChangePassword
+                    ? "Pengguna belum mengganti password awal/sementara dari admin."
+                    : "Pakai jika pengguna lupa password."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col">
+              <ResetPasswordControl userId={user.id} disabled={isSelf} />
             </CardContent>
           </Card>
 

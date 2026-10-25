@@ -13,7 +13,8 @@ import { changePasswordSchema } from "@/lib/validations/auth";
 
 import { authErrorMessage } from "./auth-errors";
 
-export function ChangePasswordForm() {
+// `redirectTo`: setelah berhasil, pindah ke halaman ini (dipakai alur wajib ganti password).
+export function ChangePasswordForm({ redirectTo }: { redirectTo?: string } = {}) {
   const {
     register,
     handleSubmit,
@@ -42,6 +43,11 @@ export function ChangePasswordForm() {
         }
         reset();
         toast.success("Password diganti. Perangkat lain sudah dikeluarkan.");
+        if (redirectTo) {
+          // Navigasi penuh: session baru saja diganti, dan cache router client masih menyimpan
+          // redirect lama ke halaman ini.
+          window.location.assign(redirectTo);
+        }
       })}
     >
       <FieldGroup>

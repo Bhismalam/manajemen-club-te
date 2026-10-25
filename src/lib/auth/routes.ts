@@ -5,6 +5,7 @@ export const DASHBOARD_PATH = "/dashboard";
 export const TWO_FACTOR_PATH = "/login/two-factor";
 export const SECURITY_SETTINGS_PATH = "/settings/security";
 export const MFA_SETUP_PATH = "/settings/security/mfa-setup";
+export const CHANGE_PASSWORD_PATH = "/settings/change-password";
 
 const ROLE_HOME: Record<UserRole, string> = {
   ADMIN: "/admin",

@@ -74,6 +74,7 @@ export async function getUserDetail(userId: string) {
       status: true,
       banReason: true,
       twoFactorEnabled: true,
+      mustChangePassword: true,
       lastLoginAt: true,
       createdAt: true,
       athleteProfile: { select: { id: true, athleteNumber: true, fullName: true } },
@@ -154,6 +155,8 @@ export async function createUser(
 
   try {
     await prisma.$transaction(async (tx) => {
+      // Password awal dibuat admin: wajib diganti pengguna saat login pertama.
+      await tx.user.update({ where: { id: userId }, data: { mustChangePassword: true } });
       if (input.role === "ATHLETE") {
         await tx.athleteProfile.create({
           data: {
@@ -307,4 +310,41 @@ export async function setUserRole(
       metadata: { from: target.role, to: input.role },
     });
   });
+}
+
+// Admin membuat password sementara baru (pengguna lupa password). Semua session pengguna dicabut,
+// dan pengguna wajib membuat password sendiri saat login berikutnya.
+export async function resetUserPassword(
+  admin: CurrentUser,
+  userId: string,
+  requestHeaders: Headers,
+): Promise<{ email: string; temporaryPassword: string }> {
+  if (userId === admin.id) {
+    throw new AppError(
+      "FORBIDDEN",
+      "Untuk akunmu sendiri, gunakan Ganti password di menu Keamanan.",
+    );
+  }
+  const user = await prisma.user.findFirst({
+    where: { id: userId, deletedAt: null },
+    select: { id: true, email: true },
+  });
+  if (!user) throw new AppError("NOT_FOUND", "Pengguna tidak ditemukan.");
+
+  const temporaryPassword = generateTemporaryPassword();
+  await auth.api.setUserPassword({
+    body: { userId: user.id, newPassword: temporaryPassword },
+    headers: requestHeaders,
+  });
+  await auth.api.revokeUserSessions({ body: { userId: user.id }, headers: requestHeaders });
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({ where: { id: user.id }, data: { mustChangePassword: true } });
+    await writeAuditLog(tx, {
+      actorUserId: admin.id,
+      action: "user.password_reset",
+      entityType: "User",
+      entityId: user.id,
+    });
+  });
+  return { email: user.email, temporaryPassword };
 }

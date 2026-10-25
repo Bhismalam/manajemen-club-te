@@ -121,9 +121,11 @@ model User {
   twoFactorEnabled Boolean @default(false)
 
   // additional fields aplikasi
-  status      UserStatus @default(ACTIVE)
-  lastLoginAt DateTime?
-  deletedAt   DateTime?
+  status             UserStatus @default(ACTIVE)
+  lastLoginAt        DateTime?
+  deletedAt          DateTime?
+  // Password awal dari admin (akun baru / reset): wajib diganti sebelum memakai aplikasi.
+  mustChangePassword Boolean    @default(false)
 
   sessions   Session[]
   accounts   Account[]

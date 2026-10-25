@@ -19,7 +19,13 @@ import type { UpdateUserAccountInput } from "@/lib/validations/users";
 import { updateUserAccountSchema } from "@/lib/validations/users";
 
 import { resetUserMfaAction } from "./mfa-actions";
-import { setUserRoleAction, setUserStatusAction, updateUserAccountAction } from "./user-actions";
+import { TemporaryPasswordDialog } from "./temporary-password-dialog";
+import {
+  resetUserPasswordAction,
+  setUserRoleAction,
+  setUserStatusAction,
+  updateUserAccountAction,
+} from "./user-actions";
 
 // Tampilkan hasil action sebagai toast; true jika berhasil. Data halaman diperbarui oleh
 // `refresh()` di dalam action.
@@ -264,6 +270,54 @@ export function ResetMfaControl({ userId, disabled }: { userId: string; disabled
           />
         </Field>
       </ConfirmDialog>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+
+// Pengguna lupa password: admin membuat password sementara yang ditampilkan sekali.
+export function ResetPasswordControl({ userId, disabled }: { userId: string; disabled: boolean }) {
+  const [open, setOpen] = useState(false);
+  const [issued, setIssued] = useState<{ email: string; temporaryPassword: string } | null>(null);
+
+  return (
+    <>
+      <Button
+        variant="outline"
+        className="self-start"
+        disabled={disabled}
+        onClick={() => setOpen(true)}
+      >
+        Buat password sementara
+      </Button>
+      <ConfirmDialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Buat password sementara?"
+        description="Password lama tidak berlaku lagi dan pengguna keluar dari semua perangkat. Berikan password sementara langsung ke pengguna; ia wajib menggantinya saat login."
+        confirmLabel="Buat password"
+        pendingLabel="Membuat…"
+        destructive
+        onConfirm={async () => {
+          const result = await resetUserPasswordAction({ userId });
+          if (!result.success) {
+            toast.error(result.error.message);
+            return false;
+          }
+          setIssued(result.data);
+          return true;
+        }}
+      />
+      {issued && (
+        <TemporaryPasswordDialog
+          open
+          title="Password sementara dibuat"
+          email={issued.email}
+          password={issued.temporaryPassword}
+          onDone={() => setIssued(null)}
+        />
+      )}
     </>
   );
 }

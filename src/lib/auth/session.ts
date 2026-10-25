@@ -6,7 +6,12 @@ import { cache } from "react";
 
 import type { UserRole } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth/auth";
-import { dashboardPathFor, LOGIN_PATH, MFA_SETUP_PATH } from "@/lib/auth/routes";
+import {
+  CHANGE_PASSWORD_PATH,
+  dashboardPathFor,
+  LOGIN_PATH,
+  MFA_SETUP_PATH,
+} from "@/lib/auth/routes";
 
 export type CurrentUser = {
   id: string;
@@ -14,6 +19,8 @@ export type CurrentUser = {
   email: string;
   role: UserRole;
   twoFactorEnabled: boolean;
+  // Masih memakai password awal dari admin.
+  mustChangePassword: boolean;
 };
 
 // Satu kali baca session per request. Sengaja tidak memakai `use cache: private`:
@@ -31,12 +38,22 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     email: user.email,
     role: user.role as UserRole,
     twoFactorEnabled: Boolean(user.twoFactorEnabled),
+    mustChangePassword: Boolean(user.mustChangePassword),
   };
 });
 
-export async function requireUser(): Promise<CurrentUser> {
+// Login saja, tanpa kewajiban ganti password. Hanya untuk halaman ganti password itu sendiri.
+export async function requireSignedIn(): Promise<CurrentUser> {
   const user = await getCurrentUser();
   if (!user) redirect(LOGIN_PATH);
+  return user;
+}
+
+// User yang masih memakai password awal dari admin harus menggantinya dulu (sebelum setup MFA
+// admin dan sebelum halaman/aksi apa pun).
+export async function requireUser(): Promise<CurrentUser> {
+  const user = await requireSignedIn();
+  if (user.mustChangePassword) redirect(CHANGE_PASSWORD_PATH);
   return user;
 }
 

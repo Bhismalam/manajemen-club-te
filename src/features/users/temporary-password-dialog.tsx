@@ -19,11 +19,13 @@ export function TemporaryPasswordDialog({
   email,
   password,
   onDone,
+  title = "Akun dibuat",
 }: {
   open: boolean;
   email: string;
   password: string;
   onDone: () => void;
+  title?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -31,10 +33,10 @@ export function TemporaryPasswordDialog({
     <Dialog open={open} onOpenChange={(next) => !next && onDone()}>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Akun dibuat</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
             Serahkan email dan password awal ini ke pengguna. Password tidak akan ditampilkan lagi.
-            Minta pengguna menggantinya di menu Keamanan akun setelah masuk.
+            Saat login berikutnya, pengguna langsung diminta membuat password baru.
           </DialogDescription>
         </DialogHeader>
         <dl className="grid gap-3 rounded-lg border bg-muted/40 p-4 text-sm">
