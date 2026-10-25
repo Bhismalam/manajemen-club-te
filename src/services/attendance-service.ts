@@ -210,22 +210,26 @@ export async function getAttendanceSummary(actor: Actor, filter: AttendanceSumma
 }
 
 // Riwayat absensi atlet sendiri (terbaru dulu).
+// Riwayat absensi satu atlet. Akses ke atlet dicek pemanggil (requireAthleteAccess / session).
+export async function getAthleteAttendanceHistory(athleteId: string, take = 20) {
+  const [records, all] = await Promise.all([
+    prisma.attendance.findMany({
+      where: { athleteId },
+      orderBy: { trainingSession: { startsAt: "desc" } },
+      take,
+      select: {
+        id: true,
+        status: true,
+        note: true,
+        trainingSession: { select: { title: true, startsAt: true } },
+      },
+    }),
+    prisma.attendance.findMany({ where: { athleteId }, select: { status: true } }),
+  ]);
+  return { records, counts: summarizeAttendance(all.map((record) => record.status)) };
+}
+
 export async function getMyAttendanceHistory(actor: Actor, take = 20) {
   if (!actor.athleteId) return { records: [], counts: summarizeAttendance([]) };
-  const records = await prisma.attendance.findMany({
-    where: { athleteId: actor.athleteId },
-    orderBy: { trainingSession: { startsAt: "desc" } },
-    take,
-    select: {
-      id: true,
-      status: true,
-      note: true,
-      trainingSession: { select: { title: true, startsAt: true } },
-    },
-  });
-  const all = await prisma.attendance.findMany({
-    where: { athleteId: actor.athleteId },
-    select: { status: true },
-  });
-  return { records, counts: summarizeAttendance(all.map((record) => record.status)) };
+  return getAthleteAttendanceHistory(actor.athleteId, take);
 }

@@ -56,6 +56,46 @@ export async function listAthletes(actor: Actor, filter: AthleteListFilter) {
   return { items, total, page: filter.page, pageSize: ATHLETE_PAGE_SIZE };
 }
 
+// Atlet binaan pelatih (semua, tanpa paginasi: satu pelatih membina puluhan atlet), dengan
+// jumlah PB dan tanggal evaluasi terakhir untuk menandai yang perlu dievaluasi.
+export async function listCoachAthletes(actor: Actor, q = "") {
+  const athletes = await prisma.athleteProfile.findMany({
+    where: {
+      AND: [
+        athleteScope(actor),
+        q
+          ? {
+              OR: [
+                { fullName: { contains: q, mode: "insensitive" } },
+                { athleteNumber: { contains: q, mode: "insensitive" } },
+              ],
+            }
+          : {},
+      ],
+    },
+    orderBy: [{ isActive: "desc" }, { fullName: "asc" }],
+    select: {
+      id: true,
+      fullName: true,
+      athleteNumber: true,
+      gender: true,
+      birthDate: true,
+      isActive: true,
+      trainingGroup: { select: { name: true } },
+      _count: { select: { personalBests: true } },
+      evaluations: {
+        orderBy: { evaluationDate: "desc" },
+        take: 1,
+        select: { evaluationDate: true },
+      },
+    },
+  });
+  return athletes.map(({ evaluations, ...athlete }) => ({
+    ...athlete,
+    lastEvaluationDate: evaluations[0]?.evaluationDate ?? null,
+  }));
+}
+
 export async function getAthleteDetail(actor: Actor, athleteId: string) {
   await requireAthleteAccess(actor, athleteId, "view");
   const athlete = await prisma.athleteProfile.findUniqueOrThrow({

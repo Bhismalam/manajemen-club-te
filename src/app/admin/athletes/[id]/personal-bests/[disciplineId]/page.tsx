@@ -4,10 +4,9 @@ import { Suspense } from "react";
 
 import { PageSkeleton } from "@/components/shared/page-skeleton";
 import { DisciplineProgress } from "@/features/personal-bests/discipline-progress";
-import { prisma } from "@/lib/db/prisma";
 import { isAppError } from "@/lib/errors";
 import { requireActor } from "@/lib/permissions/actor";
-import { requireAthleteAccess } from "@/lib/permissions/guards";
+import { getAthleteDetail } from "@/services/athlete-service";
 
 export const metadata: Metadata = { title: "Progres Personal Best" };
 
@@ -28,16 +27,14 @@ async function Content({
 }) {
   const actor = await requireActor("ADMIN");
   const { id, disciplineId } = await params;
+  // getAthleteDetail memeriksa izin lihat atlet (404 di luar scope).
+  let athlete;
   try {
-    await requireAthleteAccess(actor, id, "view");
+    athlete = await getAthleteDetail(actor, id);
   } catch (error) {
     if (isAppError(error)) notFound();
     throw error;
   }
-  const athlete = await prisma.athleteProfile.findUniqueOrThrow({
-    where: { id },
-    select: { fullName: true },
-  });
   return (
     <DisciplineProgress athleteId={id} athleteName={athlete.fullName} disciplineId={disciplineId} />
   );
