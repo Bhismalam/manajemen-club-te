@@ -331,6 +331,8 @@ Prioritas mobile:
 
 ## 17. Public Website
 
+Komponen (`src/components/public`): `SiteHeader` (navbar, sheet di mobile, garis aqua di bawah item aktif), `SiteFooter` (latar navy), `PageIntro` + `LaneLines` (garis lintasan & marka "T" putih transparan, tanpa foto), `Section`, `CoachCard` (inisial), `PublicEventCard`, `MedalCounts`, `CtaBand` (WhatsApp).
+
 ### Homepage
 
 Urutan:

@@ -237,6 +237,12 @@ Allowed (dokumen event):
 - `Cache-Control: no-store` pada response.
 - Setiap export dicatat di audit log (siapa, event apa, format, waktu).
 
+## 12.2 Website Publik
+
+- Hanya data publik/agregat: jumlah atlet/pelatih/kelompok, nama & spesialisasi pelatih, kelompok latihan, event terbit (bukan DRAFT/CANCELLED), dan rekap medali per event.
+- **Tidak** menampilkan nama atlet, nomor atlet, tanggal lahir, kontak pribadi, atau PDF event (PDF hanya untuk anggota yang login). Menampilkan nama atlet di halaman publik memerlukan persetujuan atlet/orang tua dan flag khusus (belum ada).
+- Pendaftaran event tetap lewat akun anggota (`/login`).
+
 ## 13. Sensitive Data
 
 Jangan expose:

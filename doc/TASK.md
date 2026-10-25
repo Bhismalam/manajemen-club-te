@@ -250,16 +250,18 @@ Gunakan:
 
 ## PHASE 14 — Public Website
 
-- [ ] Home.
-- [ ] About.
-- [ ] Programs.
-- [ ] Coaches.
-- [ ] Achievements.
-- [ ] Events.
-- [ ] Gallery.
-- [ ] Contact.
-- [ ] Responsive navbar.
-- [ ] Footer.
+- [x] Home (hero + statistik klub, tentang, program, alasan bergabung, pelatih, prestasi, event mendatang, galeri, CTA WhatsApp).
+- [x] About (cerita, statistik, visi & misi, tempat latihan).
+- [x] Programs (program dari `src/constants/site.ts` + kelompok latihan aktif dari database).
+- [x] Coaches (nama, spesialisasi, kelompok; tanpa kontak pribadi).
+- [x] Achievements (rekap medali per kejuaraan, agregat tanpa nama atlet).
+- [x] Events (akan datang / sudah berlangsung, status pendaftaran, "Masuk untuk mendaftar").
+- [x] Gallery (dari `SITE.gallery`; menu disembunyikan selama belum ada foto).
+- [x] Contact (alamat + maps, WhatsApp, email, Instagram, jam layanan).
+- [x] Responsive navbar (menu samping di mobile, penanda halaman aktif).
+- [x] Footer.
+- [x] Data publik di-cache (`use cache` + `cacheLife("minutes")`): halaman dirender statis dan diperbarui ±1 menit.
+- [ ] Isi konten klub yang sebenarnya di `src/constants/site.ts` (nama, alamat, kontak, program, foto galeri). Saat ini masih contoh.
 
 ## PHASE 15 — Security
 

@@ -112,7 +112,7 @@ Admin klik "Download Excel/PDF"
 
 ### Public
 
-Route contoh:
+Grup route `src/app/(public)` dengan navbar + footer sendiri. Konten statis klub di `src/constants/site.ts`; data dinamis lewat `src/services/public-service.ts`.
 
 - `/`
 - `/about`
@@ -382,7 +382,7 @@ File export Excel/PDF dibuat on-the-fly saat diminta dan di-stream ke browser, *
 
 MVP:
 
-- Gunakan Next.js caching hanya untuk data publik yang aman.
+- Gunakan Next.js caching hanya untuk data publik yang aman. Website publik memakai `"use cache"` + `cacheLife("minutes")` + `cacheTag("public-site")` di `public-service.ts`: halaman dirender statis saat build (butuh `DATABASE_URL` saat build) dan diperbarui di background ±1 menit.
 - Dashboard sensitif harus selalu mematuhi session.
 - Hindari cache lintas-user.
 - Response export dan signed URL wajib `Cache-Control: no-store`.
