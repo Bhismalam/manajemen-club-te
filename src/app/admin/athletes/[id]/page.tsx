@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GENDER_LABEL, USER_STATUS_LABEL } from "@/constants/labels";
 import { AthleteProfileForm } from "@/features/athletes/athlete-profile-form";
+import { EvaluationCard, NoEvaluations } from "@/features/evaluations/evaluation-card";
 import { PersonalBestGrid } from "@/features/personal-bests/personal-best-card";
 import { RaceHistory } from "@/features/race-results/race-history";
 import { userStatusTone } from "@/features/users/user-status";
@@ -17,6 +18,7 @@ import { ageOn, formatDate, toDateInputValue } from "@/lib/format";
 import { requireActor } from "@/lib/permissions/actor";
 import type { Actor } from "@/lib/permissions/types";
 import { getAthleteDetail } from "@/services/athlete-service";
+import { listEvaluations } from "@/services/evaluation-service";
 import { listPersonalBests } from "@/services/personal-best-service";
 import { listAthleteRaceHistory } from "@/services/race-result-service";
 import { listTrainingGroupOptions } from "@/services/training-group-service";
@@ -44,10 +46,11 @@ async function AthleteDetail({ params }: { params: PageProps<"/admin/athletes/[i
   const actor = await requireActor("ADMIN");
   const { id } = await params;
   const athlete = await loadAthlete(actor, id);
-  const [groups, pbs, history] = await Promise.all([
+  const [groups, pbs, history, evaluations] = await Promise.all([
     listTrainingGroupOptions(),
     listPersonalBests(id),
     listAthleteRaceHistory(id),
+    listEvaluations(actor, { athlete: id, page: 1 }),
   ]);
 
   return (
@@ -149,6 +152,22 @@ async function AthleteDetail({ params }: { params: PageProps<"/admin/athletes/[i
               history={history}
               emptyDescription="Hasil lomba atlet ini akan muncul setelah dicatat di menu Hasil Lomba."
             />
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-lg font-semibold">
+              Evaluasi pelatih{" "}
+              <span className="text-sm font-normal text-muted-foreground">
+                ({evaluations.total})
+              </span>
+            </h2>
+            {evaluations.items.length === 0 ? (
+              <NoEvaluations description="Evaluasi ditulis oleh pelatih atlet ini." />
+            ) : (
+              evaluations.items.map((evaluation) => (
+                <EvaluationCard key={evaluation.id} evaluation={evaluation} />
+              ))
+            )}
           </section>
         </div>
       </div>

@@ -149,7 +149,7 @@ Route contoh:
 - `/coach/competitions`, `/coach/competitions/new`, `/coach/competitions/[id]` (kelola event buatan sendiri; event lain read-only)
 - `/coach/competitions/[id]/register` (daftarkan atlet binaan, status pendaftaran atlet binaan)
 - `/coach/results`, `/coach/results/[id]` (hasil lomba atlet binaan)
-- `/coach/evaluations`
+- `/coach/evaluations`, `/coach/evaluations/new`, `/coach/evaluations/[id]`
 
 ### Athlete
 
@@ -202,7 +202,7 @@ Service layer:
 - Export rekap: `src/features/exports/` (`roster-data.ts` → `roster-xlsx.ts` via `exceljs`, `roster-pdf.tsx` via `@react-pdf/renderer`), dipanggil Route Handler export
 - `NotificationService` (`notification-service.ts`: hitung belum dibaca, daftar terbaru, tandai dibaca)
 - Storage: `src/lib/storage/supabase.ts` (client Supabase server-only) + `src/lib/storage/pdf.ts` (aturan PDF, key objek)
-- `EvaluationService`
+- `EvaluationService` (`evaluation-service.ts`: daftar/detail sesuai `athleteScope`, tulis oleh pelatih, ubah sesuai `canEditEvaluation`)
 
 ## 7. Data Access
 

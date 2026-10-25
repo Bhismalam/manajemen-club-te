@@ -208,11 +208,11 @@ Gunakan:
 
 ## PHASE 12 — Coach Evaluation
 
-- [ ] Evaluation list.
-- [ ] Create evaluation.
-- [ ] Edit evaluation.
-- [ ] Athlete evaluation view.
-- [ ] Permission check.
+- [x] Evaluation list (`/coach/evaluations`, filter per atlet binaan, paginasi).
+- [x] Create evaluation (`/coach/evaluations/new?athlete=`): atlet binaan aktif, tanggal ≤ hari ini, kekuatan, kekurangan, fokus perbaikan, target berikutnya, catatan.
+- [x] Edit evaluation (`/coach/evaluations/[id]`): pelatih penulis selama masih membina atlet; atlet tidak bisa dipindah; evaluasi pelatih lain read-only. Tidak ada hapus (riwayat pembinaan).
+- [x] Athlete evaluation view (`/athlete/evaluations`) + bagian "Evaluasi pelatih" di detail atlet admin.
+- [x] Permission check: `athleteScope` di semua query (404 di luar scope), `canEditEvaluation`, hanya pelatih dengan profil aktif yang menulis; admin bisa mengoreksi lewat action. Audit `evaluation.created/updated`.
 
 ## PHASE 13 — Dashboards
 

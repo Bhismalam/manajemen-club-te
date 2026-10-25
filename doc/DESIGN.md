@@ -123,7 +123,9 @@ Komponen event (Phase 10/10b): `DisciplinePicker` (`features/competitions`, chec
 
 Komponen hasil lomba (Phase 11): `DisciplineResultForm` (lembar input per nomor; tabel di desktop, kartu di mobile), `ResultEventList`, `RaceHistory` (riwayat + rekap medali) di `features/race-results`. Medali memakai token `gold` / `silver` / `bronze` (`bg-gold/15 text-gold`).
 
-Belum dibuat (menyusul sesuai fase): AthleteCard, CoachCard, EvaluationCard, FormModal.
+Komponen evaluasi (Phase 12): `EvaluationCard` (isi lengkap, 4 bagian), `EvaluationRows` (daftar ringkas pelatih), `EvaluationForm` di `features/evaluations`.
+
+Belum dibuat (menyusul sesuai fase): AthleteCard, CoachCard, FormModal.
 
 ## 8. Dashboard Admin
 
