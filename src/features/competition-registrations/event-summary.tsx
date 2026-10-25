@@ -28,7 +28,9 @@ export function eventDateRange(start: Date, end: Date) {
 }
 
 // Badge periode pendaftaran untuk kartu & detail event.
-export function RegistrationWindowBadge({ event, now }: { event: EventInfo; now: Date }) {
+type WindowInfo = Pick<EventInfo, "status" | "registrationOpensAt" | "registrationClosesAt">;
+
+export function RegistrationWindowBadge({ event, now }: { event: WindowInfo; now: Date }) {
   const window = registrationWindowState(event, now);
   if (event.status !== "UPCOMING" || window.state === "closed") {
     return <StatusBadge tone="neutral">Pendaftaran ditutup</StatusBadge>;
@@ -40,7 +42,7 @@ export function RegistrationWindowBadge({ event, now }: { event: EventInfo; now:
 }
 
 // Pesan saat form pendaftaran tidak bisa diubah oleh atlet/pelatih.
-export function closedRegistrationMessage(event: EventInfo, now: Date) {
+export function closedRegistrationMessage(event: WindowInfo, now: Date) {
   const window = registrationWindowState(event, now);
   if (event.status === "UPCOMING" && window.state === "not_open") {
     return `Pendaftaran baru dibuka ${formatDateTime(window.opensAt)} ${CLUB_TIME_ZONE_LABEL}.`;

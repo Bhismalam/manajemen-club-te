@@ -175,9 +175,14 @@ export function ProgressChart({ points, title }: { points: ChartPoint[]; title: 
 
             {current && (
               <text
-                x={geometry.x(current.time) - 8}
+                // Label di kiri titik, kecuali titik terlalu dekat sumbu y (agar tidak menimpa angka).
+                x={
+                  geometry.x(current.time) - PAD.left < 80
+                    ? geometry.x(current.time) + 8
+                    : geometry.x(current.time) - 8
+                }
                 y={geometry.y(current.durationMs) - 12}
-                textAnchor="end"
+                textAnchor={geometry.x(current.time) - PAD.left < 80 ? "start" : "end"}
                 className="fill-foreground font-mono text-xs font-semibold"
               >
                 PB {formatDuration(current.durationMs)}

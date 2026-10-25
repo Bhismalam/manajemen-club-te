@@ -7,11 +7,16 @@ export function StatCard({
   value,
   icon: Icon,
   href,
+  suffix,
+  hint,
 }: {
   label: string;
-  value: number;
+  // null = belum ada data (ditampilkan "—"). String untuk nilai berformat (mis. waktu renang).
+  value: number | string | null;
   icon: LucideIcon;
   href?: string;
+  suffix?: string;
+  hint?: string;
 }) {
   const body = (
     <>
@@ -19,7 +24,11 @@ export function StatCard({
         <span>{label}</span>
         <Icon className="size-4" aria-hidden="true" />
       </div>
-      <p className="numeric text-3xl font-semibold text-foreground">{value}</p>
+      <p className="numeric text-3xl font-semibold text-foreground">
+        {value ?? "—"}
+        {value !== null && suffix && <span className="ml-0.5 text-lg">{suffix}</span>}
+      </p>
+      {hint && <p className="-mt-2 text-xs text-muted-foreground">{hint}</p>}
     </>
   );
 

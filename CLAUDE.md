@@ -198,7 +198,7 @@ Jangan hanya menyembunyikan button di frontend.
 
 Guard yang tersedia di `src/lib/auth/session.ts`:
 
-- `requireUser()`: semua halaman/aksi yang butuh login.
+- `requireUser()`: semua halaman/aksi yang butuh login (termasuk mengarahkan akun yang masih memakai password awal/sementara ke `/settings/change-password`). `requireSignedIn()` hanya untuk halaman ganti password itu sendiri.
 - `requireRole("COACH" | "ATHLETE", ...)`: area pelatih/atlet.
 - `requireAdmin()`: **wajib** untuk semua page, Server Action, dan Route Handler admin (termasuk cek MFA). Jangan pakai `requireRole("ADMIN")` untuk area admin.
 

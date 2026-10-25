@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { AppSidebar } from "./app-sidebar";
 import { AthleteBottomNav } from "./athlete-bottom-nav";
 import { DashboardBreadcrumb } from "./dashboard-breadcrumb";
+import { NotificationBell } from "./notification-bell";
 import { UserMenu, UserMenuSkeleton } from "./user-menu";
 
 // App shell dashboard: sidebar (drawer di mobile), header, area konten.
@@ -25,7 +26,12 @@ export function DashboardShell({ role, children }: { role: UserRole; children: R
             className="mr-1 data-vertical:h-5 data-vertical:self-center"
           />
           <DashboardBreadcrumb role={role} />
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            {role === "ADMIN" && (
+              <Suspense fallback={null}>
+                <NotificationBell />
+              </Suspense>
+            )}
             <Suspense fallback={<UserMenuSkeleton />}>
               <UserMenu />
             </Suspense>

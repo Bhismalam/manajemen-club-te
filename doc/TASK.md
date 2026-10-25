@@ -160,7 +160,7 @@ Gunakan:
 - [x] Highlight new PB (badge "PB baru" untuk PB ≤ 30 hari; "PB saat itu" di riwayat).
 - [x] Grafik perkembangan waktu (SVG, sumbu y dibalik "lebih cepat ↑", tick bulat, tooltip mouse & keyboard, tabel sebagai alternatif).
 - [x] Perbaikan tanggal: timestamp ditampilkan dengan `formatClubDate`; tanggal lomba dinormalkan ke siang jam klub.
-- [ ] Halaman "Atlet Binaan" pelatih + PB atlet binaan (saat ini pelatih melihat PB lewat badge di daftar time trial).
+- [x] Halaman "Atlet Binaan" pelatih + PB atlet binaan (Phase 13).
 
 ## PHASE 10 — Competition
 
@@ -218,28 +218,35 @@ Gunakan:
 
 ### Admin
 
-- [ ] Total athlete.
-- [ ] Total coach.
-- [ ] Upcoming training.
-- [ ] Upcoming competition.
-- [ ] Pendaftaran event terbaru.
-- [ ] Attendance summary.
+- [x] Total athlete & total coach (aktif), pendaftaran baru (belum dibaca), kehadiran 30 hari.
+- [x] Upcoming training (5 sesi terdekat).
+- [x] Upcoming competition (jumlah pendaftar + status periode pendaftaran, link ke rekap).
+- [x] Pendaftaran event terbaru (notifikasi) + ikon lonceng dengan jumlah belum dibaca di header admin.
+- [x] Attendance summary per kelompok (30 hari).
+- [x] Aktivitas terbaru (audit log dengan label Bahasa Indonesia).
 
 ### Coach
 
-- [ ] My athletes.
-- [ ] Today training.
-- [ ] Latest trials.
-- [ ] PB updates.
+- [x] My athletes: halaman `/coach/athletes` + detail `/coach/athletes/[id]` (data diri, kehadiran, PB + grafik, riwayat lomba, evaluasi).
+- [x] Today training (status absensi; jika kosong, latihan berikutnya).
+- [x] Latest trials.
+- [x] PB updates (PB bulan ini).
+- [x] Perlu evaluasi (belum pernah / > 30 hari, `isEvaluationDue`) + event terdekat dengan jumlah atlet binaan terdaftar.
 
 ### Athlete
 
-- [ ] Next training.
-- [ ] Event yang membuka pendaftaran.
-- [ ] PB cards.
-- [ ] Latest time trial.
-- [ ] Competition history.
-- [ ] Latest evaluation.
+- [x] Next training (hero).
+- [x] Event yang membuka pendaftaran (tombol Daftar) + lomba berikutnya yang sudah didaftari.
+- [x] PB cards + grafik perkembangan (nomor time trial terakhir).
+- [x] Latest time trial, kehadiran, jumlah medali.
+- [x] Competition history (2 event terakhir).
+- [x] Latest evaluation.
+- [x] Halaman `/athlete/profile` (data diri read-only, kehadiran, link keamanan akun).
+
+### Akun
+
+- [x] Wajib ganti password saat login pertama / setelah password sementara (`User.mustChangePassword`, halaman `/settings/change-password`).
+- [x] Admin membuat password sementara untuk pengguna yang lupa password (sesi dicabut, audit `user.password_reset`).
 
 ## PHASE 14 — Public Website
 

@@ -125,7 +125,9 @@ Komponen hasil lomba (Phase 11): `DisciplineResultForm` (lembar input per nomor;
 
 Komponen evaluasi (Phase 12): `EvaluationCard` (isi lengkap, 4 bagian), `EvaluationRows` (daftar ringkas pelatih), `EvaluationForm` di `features/evaluations`.
 
-Belum dibuat (menyusul sesuai fase): AthleteCard, CoachCard, FormModal.
+Komponen dashboard (Phase 13): `SectionCard` / `SectionEmpty` (`components/shared`), `StatCard` dengan `suffix`/`hint` dan nilai teks, `AttendanceBar`, `NotificationBell` (header admin), `AthleteSummary` (data diri atlet), dashboard per role di `features/dashboard`.
+
+Belum dibuat (menyusul sesuai fase): CoachCard, FormModal.
 
 ## 8. Dashboard Admin
 

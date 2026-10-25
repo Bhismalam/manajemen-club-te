@@ -144,7 +144,7 @@ Route contoh:
 - `/coach/training`, `/coach/training/new`, `/coach/training/[id]` (termasuk pencatatan absensi)
 - `/coach/attendance` (rekap)
 - `/coach/attendance`
-- `/coach/athletes`
+- `/coach/athletes`, `/coach/athletes/[id]`, `/coach/athletes/[id]/personal-bests/[disciplineId]` (atlet binaan, read-only)
 - `/coach/time-trials`, `/coach/time-trials/new`, `/coach/time-trials/[id]`
 - `/coach/competitions`, `/coach/competitions/new`, `/coach/competitions/[id]` (kelola event buatan sendiri; event lain read-only)
 - `/coach/competitions/[id]/register` (daftarkan atlet binaan, status pendaftaran atlet binaan)
@@ -154,7 +154,7 @@ Route contoh:
 ### Athlete
 
 - `/athlete`
-- `/athlete/profile`
+- `/athlete/profile` (data diri read-only, kehadiran)
 - `/athlete/schedule`
 - `/athlete/events` (event yang membuka pendaftaran + status pendaftaran saya)
 - `/athlete/events/[id]` (detail, unduh PDF, pilih nomor lomba)
@@ -171,6 +171,7 @@ Route contoh:
 - `/reset-password`
 - `/settings/security` (ganti password, aktif/nonaktif MFA, regenerate recovery codes)
 - `/settings/security/mfa-setup` (wajib untuk admin yang belum enroll)
+- `/settings/change-password` (wajib untuk akun yang masih memakai password awal/sementara dari admin; guard `requireSignedIn`)
 
 ### API Route Handlers
 
@@ -200,6 +201,7 @@ Service layer:
 - `UserAdminService` (`user-admin-service.ts`: buat akun + profil lewat API admin Better Auth, status/role)
 - `TrainingGroupService`
 - Export rekap: `src/features/exports/` (`roster-data.ts` → `roster-xlsx.ts` via `exceljs`, `roster-pdf.tsx` via `@react-pdf/renderer`), dipanggil Route Handler export
+- `DashboardService` (`dashboard-service.ts`: ringkasan admin/pelatih/atlet, semua query memakai scope)
 - `NotificationService` (`notification-service.ts`: hitung belum dibaca, daftar terbaru, tandai dibaca)
 - Storage: `src/lib/storage/supabase.ts` (client Supabase server-only) + `src/lib/storage/pdf.ts` (aturan PDF, key objek)
 - `EvaluationService` (`evaluation-service.ts`: daftar/detail sesuai `athleteScope`, tulis oleh pelatih, ubah sesuai `canEditEvaluation`)

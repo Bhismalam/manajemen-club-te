@@ -88,7 +88,8 @@ Perlindungan:
 
 - Hanya admin yang membuat akun (pendaftaran publik dimatikan). Akun dibuat lewat API admin Better Auth dengan session admin, jadi Better Auth ikut memeriksa izin.
 - Password awal: 12 karakter acak kriptografis tanpa karakter ambigu, **ditampilkan sekali** ke admin untuk diserahkan langsung. Tidak disimpan dalam bentuk asli dan tidak dikirim lewat chat/email oleh sistem.
-- Pengguna diminta mengganti password di Keamanan akun; mengganti password mencabut sesi di perangkat lain.
+- Pengguna **wajib** membuat password sendiri saat login pertama: `User.mustChangePassword` diset saat akun dibuat, dan `requireUser()` mengarahkan ke `/settings/change-password` sampai password diganti (flag dihapus di hook Better Auth setelah `/change-password` berhasil). Mengganti password mencabut sesi di perangkat lain.
+- Lupa password (selama layanan email belum ada): admin membuat **password sementara** di detail user. Password lama tidak berlaku, semua sesi pengguna dicabut, pengguna wajib menggantinya saat login, dan aksi dicatat (`user.password_reset`). Admin tidak bisa memakai fitur ini untuk akunnya sendiri.
 - Menonaktifkan/menangguhkan akun memakai `banUser` Better Auth (semua sesi langsung dicabut) dan wajib disertai alasan (tercatat di audit log).
 
 ## 3. Authorization
