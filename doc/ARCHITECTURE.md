@@ -412,6 +412,7 @@ Kategori:
 - FORBIDDEN.
 - NOT_FOUND.
 - CONFLICT.
+- RATE_LIMITED (terlalu banyak permintaan, HTTP 429).
 - INTERNAL_ERROR.
 
 ## 16. Scalability

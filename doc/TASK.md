@@ -265,18 +265,19 @@ Gunakan:
 
 ## PHASE 15 — Security
 
-- [ ] Server-side validation.
-- [ ] RBAC test.
-- [ ] IDOR test.
-- [ ] Rate limiting (endpoint non-auth: pendaftaran event, export, contact form).
-- [ ] Pastikan IP klien terbaca benar di Vercel (`x-forwarded-for`), karena rate limit auth berbasis IP.
-- [ ] Evaluasi token session di body respons sign-in Better Auth (cookie tetap HttpOnly; mitigasi utama: CSP + cegah XSS).
-- [ ] Cek apakah kode TOTP bisa dipakai ulang dalam window 30 detik; jika ya, tambahkan pencegahan replay.
-- [ ] Secure headers.
-- [ ] Upload validation.
-- [ ] Error sanitization.
-- [ ] Audit logging.
-- [ ] Dependency audit.
+- [x] Server-side validation: semua 12 file Server Action memanggil guard lalu `safeParse` Zod; route handler memvalidasi parameter.
+- [x] RBAC test: matriks akses tamu/atlet/pelatih/admin ke area dashboard (redirect ke login / dashboard sendiri).
+- [x] IDOR test: atlet → event DRAFT & data atlet lain, pelatih → atlet non-binaan, pelatih → export admin, atlet → PDF event DRAFT (404/redirect).
+- [x] Rate limiting aksi aplikasi per user (`enforceRateLimit`): pendaftaran, export, unduh/upload PDF, hasil lomba, evaluasi, password sementara. Contact form tidak ada (kontak via WhatsApp).
+- [x] IP klien di Vercel: `ipAddressHeaders` = `x-vercel-forwarded-for`, `x-forwarded-for` (ditimpa Vercel, satu IP). Diuji: login ke-6 dari IP sama → 429, IP lain tetap bisa.
+- [x] Token session di body respons sign-in / verify / change-password dihapus (`hooks.after`); cookie HttpOnly tetap.
+- [x] TOTP replay: kode yang sudah dipakai ditolak selama 90 detik (`TOTP_CODE_REUSED`).
+- [x] Secure headers: CSP (tanpa nonce, lihat SECURITY §17), X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, COOP, HSTS (HTTPS), tanpa X-Powered-By.
+- [x] Upload validation (Phase 10: nama/MIME/ukuran + magic bytes `%PDF-`, file palsu dihapus) — diuji ulang bersama CSP (upload langsung ke Supabase).
+- [x] Error sanitization: `error.tsx` root + `global-error.tsx`; tidak ada stack/pesan internal ke pengguna.
+- [x] Audit logging: semua aksi di SECURITY §15 tercatat; label aktivitas di dashboard admin.
+- [x] Dependency audit: `pnpm audit --prod` bersih (Next 16.4.3, zod 4.6.7, overrides transitif, shadcn → devDependencies).
+- [x] Uji tambahan: XSS payload di evaluasi tampil sebagai teks, SQL injection di pencarian tidak membocorkan data, logout mencabut session, akun SUSPENDED langsung kehilangan akses.
 
 ## PHASE 16 — Testing
 

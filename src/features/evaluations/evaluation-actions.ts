@@ -7,6 +7,7 @@ import { ok, toActionError, validationFail } from "@/lib/errors";
 import { requireActor } from "@/lib/permissions/actor";
 import { createEvaluationSchema, updateEvaluationSchema } from "@/lib/validations/evaluations";
 import { createEvaluation, updateEvaluation } from "@/services/evaluation-service";
+import { enforceRateLimit } from "@/services/rate-limit-service";
 
 // Menulis evaluasi: pelatih saja. Mengubah: admin atau pelatih penulis (dicek di service).
 
@@ -17,6 +18,7 @@ export async function createEvaluationAction(
   const parsed = createEvaluationSchema.safeParse(input);
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
+    await enforceRateLimit("evaluation", actor.userId);
     return ok(await createEvaluation(actor, parsed.data), "Evaluasi disimpan.");
   } catch (error) {
     return toActionError(error);
@@ -28,6 +30,7 @@ export async function updateEvaluationAction(input: unknown): Promise<ActionResu
   const parsed = updateEvaluationSchema.safeParse(input);
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
+    await enforceRateLimit("evaluation", actor.userId);
     const { changed } = await updateEvaluation(actor, parsed.data);
     if (changed) refresh();
     return ok(undefined, changed ? "Evaluasi diperbarui." : "Tidak ada perubahan.");

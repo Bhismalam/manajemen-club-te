@@ -21,6 +21,7 @@ import {
   setUserStatus,
   updateUserAccount,
 } from "@/services/user-admin-service";
+import { enforceRateLimit } from "@/services/rate-limit-service";
 
 // Setiap action: requireAdmin (login + role + MFA) → validasi Zod di server → service.
 
@@ -87,6 +88,7 @@ export async function resetUserPasswordAction(
   const parsed = z.object({ userId: z.string().min(1).max(64) }).safeParse(input);
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
+    await enforceRateLimit("passwordReset", admin.id);
     const result = await resetUserPassword(admin, parsed.data.userId, await headers());
     refresh();
     return ok(result, "Password sementara dibuat.");

@@ -51,6 +51,8 @@ Enforcement admin:
 - Akun admin baru (termasuk seed admin) wajib setup MFA pada login pertama.
 - "Percayai perangkat ini" untuk admin diabaikan di server (`hooks.before` di `src/lib/auth/auth.ts` memaksa `trustDevice = false`), bukan hanya disembunyikan di UI.
 - Saat user dipromosikan menjadi ADMIN, panggil `revokeTrustedDevices()` (`src/services/mfa-service.ts`) agar perangkat tepercaya lamanya tidak bisa melewati MFA.
+- **Anti replay TOTP**: Better Auth hanya memeriksa validitas kode. Kode yang berhasil dipakai dicatat (hash `userId:kode`) di tabel `verification` Better Auth selama 90 detik (±1 periode 30 detik); kode yang sama ditolak dengan `TOTP_CODE_REUSED` (`hooks` di `src/lib/auth/auth.ts`).
+- Recovery code sekali pakai (dihapus Better Auth setelah dipakai). Brute force kode: rate limit `/two-factor/*` 10/5 menit per IP + lockout akun bawaan Better Auth (10 gagal → 15 menit).
 
 Setup MFA:
 
@@ -168,7 +170,13 @@ Jika menggunakan cookie session:
 
 ## 9. Rate Limiting
 
-Terapkan pada:
+Implementasi:
+
+- **Endpoint Better Auth** (per IP, storage database): sign-in 5/menit, request-password-reset 3/5 menit, reset-password 5/5 menit, two-factor 10/5 menit.
+- **IP klien**: `advanced.ipAddress.ipAddressHeaders = ["x-vercel-forwarded-for", "x-forwarded-for"]`. Di Vercel kedua header ditimpa platform dengan satu IP klien (tidak bisa dipalsukan). Better Auth menolak header berisi lebih dari satu IP; tanpa IP valid semua request berbagi satu ember (Better Auth mencatat peringatan). Jika deploy di luar Vercel, proxy di depan aplikasi wajib menimpa header ini.
+- **Aksi aplikasi** (per user, `enforceRateLimit` di `src/services/rate-limit-service.ts`, tabel `rate_limit` dengan prefix `app:`): pendaftaran event 20/menit, export rekap 10/menit, unduh PDF event 30/menit, minta upload PDF 10/menit, simpan hasil lomba 60/menit, evaluasi 20/menit, password sementara 10/menit. Melebihi batas → `RATE_LIMITED` (HTTP 429 di route handler).
+
+Daftar awal:
 
 - login.
 - verifikasi MFA (TOTP / recovery code).
@@ -194,6 +202,8 @@ Token:
 Logout:
 
 - invalidate session.
+
+Token session di body respons: Better Auth mengembalikan token session di JSON `/sign-in/email`, `/two-factor/verify-*`, dan `/change-password`. Aplikasi tidak memakainya (autentikasi lewat cookie HttpOnly), jadi `hooks.after` mengganti nilainya dengan `null` agar tidak bisa dibaca skrip. Mitigasi utama tetap mencegah XSS (React escaping, tanpa `dangerouslySetInnerHTML`) + CSP.
 
 Account disabled:
 
@@ -287,6 +297,8 @@ Catat:
 
 Jangan leak stack trace ke user.
 
+Implementasi: `error.tsx` di root dan tiap area dashboard + `global-error.tsx` menampilkan pesan umum dengan kode referensi (digest). Server Action hanya mengembalikan pesan `AppError`; error lain dilempar ulang sehingga Next.js menyembunyikan detailnya di production. Route handler hanya mengembalikan `{ code, message }` dari `AppError`.
+
 Production response:
 
 ```text
@@ -297,20 +309,22 @@ Detail teknis masuk logs.
 
 ## 17. Security Headers
 
-Pertimbangkan:
+Diset untuk semua route di `next.config.ts` (`headers()`):
 
-- Content-Security-Policy.
-- X-Frame-Options.
-- X-Content-Type-Options.
-- Referrer-Policy.
-- Permissions-Policy.
+- `Content-Security-Policy`: `default-src 'self'`, `script-src 'self' 'unsafe-inline'` (+`'unsafe-eval'` hanya dev), `connect-src 'self'` + origin Supabase (upload PDF langsung dari browser), `img-src 'self' data: blob:` + Supabase, `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`, `upgrade-insecure-requests` (HTTPS saja).
+  - Tanpa nonce: nonce memaksa semua halaman dinamis dan mematikan halaman statis/PPR (website publik, shell dashboard). Konsekuensinya skrip inline tetap diizinkan; CSP tetap memblokir skrip/koneksi ke domain lain, framing, plugin, dan perubahan `<base>`/`form action`.
+- `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (kamera, mikrofon, lokasi, dll. dimatikan), `Cross-Origin-Opener-Policy: same-origin`.
+- `Strict-Transport-Security` (2 tahun, includeSubDomains) saat `BETTER_AUTH_URL` HTTPS.
+- Header `X-Powered-By` dimatikan.
 
 ## 18. Dependency Security
 
 - Gunakan package terpercaya.
 - Hindari dependency tidak perlu.
-- Jalankan security audit.
+- Jalankan security audit (`pnpm audit --prod` harus bersih sebelum deploy).
 - Update package secara berkala.
+
+Status Phase 15: `pnpm audit --prod` tanpa temuan. Next.js 16.4.3 (perbaikan RCE), `zod` 4.6.7, `shadcn` dipindah ke devDependencies (CLI, hanya untuk import CSS saat build), dan `overrides` di `pnpm-workspace.yaml` untuk dependency transitif (undici, body-parser, ip-address, uuid, fast-uri, mysql2, deepmerge-ts). Sisa satu temuan dev-only: `zod@3` milik CLI `shadcn` (tidak ikut runtime).
 
 ## 19. Database Security
 

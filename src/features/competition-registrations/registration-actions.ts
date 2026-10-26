@@ -18,6 +18,7 @@ import {
   saveRegistration,
 } from "@/services/competition-registration-service";
 import { markNotificationsRead } from "@/services/notification-service";
+import { enforceRateLimit } from "@/services/rate-limit-service";
 
 const SAVE_MESSAGE: Record<SaveRegistrationResult["outcome"], string> = {
   created: "Pendaftaran berhasil. Admin sudah diberi tahu.",
@@ -35,6 +36,7 @@ export async function saveMyRegistrationAction(input: unknown): Promise<ActionRe
   if (!parsed.success) return validationFail(parsed.error.issues);
   if (!actor.athleteId) return fail("FORBIDDEN", NO_PROFILE);
   try {
+    await enforceRateLimit("registration", actor.userId);
     const { outcome } = await saveRegistration(actor, {
       ...parsed.data,
       athleteId: actor.athleteId,
@@ -52,6 +54,7 @@ export async function cancelMyRegistrationAction(input: unknown): Promise<Action
   if (!parsed.success) return validationFail(parsed.error.issues);
   if (!actor.athleteId) return fail("FORBIDDEN", NO_PROFILE);
   try {
+    await enforceRateLimit("registration", actor.userId);
     await cancelRegistration(actor, { ...parsed.data, athleteId: actor.athleteId });
     refresh();
     return ok(undefined, "Pendaftaran dibatalkan.");
@@ -67,6 +70,7 @@ export async function saveAthleteRegistrationAction(input: unknown): Promise<Act
   const parsed = athleteRegistrationSchema.safeParse(input);
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
+    await enforceRateLimit("registration", actor.userId);
     const { outcome } = await saveRegistration(actor, parsed.data);
     refresh();
     return ok(undefined, SAVE_MESSAGE[outcome]);
@@ -80,6 +84,7 @@ export async function cancelAthleteRegistrationAction(input: unknown): Promise<A
   const parsed = athleteRegistrationCancelSchema.safeParse(input);
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
+    await enforceRateLimit("registration", actor.userId);
     await cancelRegistration(actor, parsed.data);
     refresh();
     return ok(undefined, "Pendaftaran dibatalkan.");

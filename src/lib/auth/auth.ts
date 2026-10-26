@@ -1,5 +1,7 @@
 import "server-only";
 
+import { createHash } from "node:crypto";
+
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError, createAuthMiddleware, getSessionFromCtx } from "better-auth/api";
@@ -13,6 +15,24 @@ import { sendEmail } from "@/services/email-service";
 
 export const ACCOUNT_DISABLED_CODE = "ACCOUNT_DISABLED";
 export const ADMIN_MFA_REQUIRED_CODE = "ADMIN_MFA_REQUIRED";
+export const TOTP_CODE_REUSED_CODE = "TOTP_CODE_REUSED";
+
+// Kode TOTP berlaku ±1 periode (30 detik) di sekitar waktu sekarang; kode yang sudah dipakai
+// ditolak selama rentang itu agar tidak bisa diputar ulang (mis. kode yang terlihat orang lain).
+const TOTP_REPLAY_WINDOW_MS = 90_000;
+
+function totpReplayKey(userId: string, code: string) {
+  return `totp-used:${createHash("sha256").update(`${userId}:${code}`).digest("hex")}`;
+}
+
+// Endpoint yang mengembalikan token session di body JSON. Token juga ada di cookie HttpOnly,
+// dan aplikasi tidak memakainya dari body, jadi dihapus agar tidak terbaca skrip.
+const TOKEN_IN_BODY_PATHS = new Set([
+  "/sign-in/email",
+  "/two-factor/verify-totp",
+  "/two-factor/verify-backup-code",
+  "/change-password",
+]);
 
 // Endpoint verifikasi MFA saat login (menerima opsi `trustDevice`).
 const TWO_FACTOR_SIGN_IN_PATHS = new Set([
@@ -117,15 +137,37 @@ export const auth = betterAuth({
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
-      // Admin tidak boleh memakai "percayai perangkat ini": opsi diabaikan di server.
-      if (TWO_FACTOR_SIGN_IN_PATHS.has(ctx.path) && ctx.body?.trustDevice) {
+      // User yang sedang verifikasi MFA saat login (belum punya session penuh).
+      const pendingTwoFactorUserId = async () => {
         const cookie = ctx.context.createAuthCookie("two_factor");
         const identifier = await ctx.getSignedCookie(cookie.name, ctx.context.secret);
         const pending = identifier
           ? await ctx.context.internalAdapter.findVerificationValue(identifier)
           : null;
-        const user = pending
-          ? await prisma.user.findUnique({ where: { id: pending.value }, select: { role: true } })
+        return pending?.value ?? null;
+      };
+
+      // Tolak kode TOTP yang sudah pernah dipakai dalam rentang validitasnya (replay).
+      if (ctx.path === "/two-factor/verify-totp" && typeof ctx.body?.code === "string") {
+        const userId = (await getSessionFromCtx(ctx))?.user.id ?? (await pendingTwoFactorUserId());
+        if (userId) {
+          const used = await ctx.context.internalAdapter.findVerificationValue(
+            totpReplayKey(userId, ctx.body.code),
+          );
+          if (used && new Date(used.expiresAt) > new Date()) {
+            throw new APIError("BAD_REQUEST", {
+              code: TOTP_CODE_REUSED_CODE,
+              message: "This code has already been used",
+            });
+          }
+        }
+      }
+
+      // Admin tidak boleh memakai "percayai perangkat ini": opsi diabaikan di server.
+      if (TWO_FACTOR_SIGN_IN_PATHS.has(ctx.path) && ctx.body?.trustDevice) {
+        const pendingUserId = await pendingTwoFactorUserId();
+        const user = pendingUserId
+          ? await prisma.user.findUnique({ where: { id: pendingUserId }, select: { role: true } })
           : null;
         if (user?.role === "ADMIN") {
           return { context: { body: { ...ctx.body, trustDevice: false } } };
@@ -145,10 +187,22 @@ export const auth = betterAuth({
     }),
     after: createAuthMiddleware(async (ctx) => {
       if (ctx.context.returned instanceof APIError) return;
-      const userId = ctx.context.session?.user.id;
-      if (!userId) return;
 
-      if (ctx.path === "/two-factor/generate-backup-codes") {
+      // Catat kode TOTP yang berhasil dipakai (login maupun aktivasi MFA).
+      if (ctx.path === "/two-factor/verify-totp" && typeof ctx.body?.code === "string") {
+        const verifiedUserId = ctx.context.newSession?.user.id ?? ctx.context.session?.user.id;
+        if (verifiedUserId) {
+          await ctx.context.internalAdapter.createVerificationValue({
+            identifier: totpReplayKey(verifiedUserId, ctx.body.code),
+            value: "used",
+            expiresAt: new Date(Date.now() + TOTP_REPLAY_WINDOW_MS),
+          });
+        }
+      }
+
+      const userId = ctx.context.session?.user.id ?? ctx.context.newSession?.user.id;
+
+      if (ctx.path === "/two-factor/generate-backup-codes" && userId) {
         await writeAuditLog(prisma, {
           actorUserId: userId,
           action: "mfa.backup_codes_regenerated",
@@ -158,7 +212,7 @@ export const auth = betterAuth({
       }
 
       // Password awal dari admin sudah diganti sendiri: kewajiban ganti password selesai.
-      if (ctx.path === "/change-password") {
+      if (ctx.path === "/change-password" && userId) {
         await prisma.user.update({ where: { id: userId }, data: { mustChangePassword: false } });
         await writeAuditLog(prisma, {
           actorUserId: userId,
@@ -167,7 +221,25 @@ export const auth = betterAuth({
           entityId: userId,
         });
       }
+
+      const returned = ctx.context.returned;
+      if (
+        TOKEN_IN_BODY_PATHS.has(ctx.path) &&
+        returned &&
+        typeof returned === "object" &&
+        "token" in returned
+      ) {
+        return ctx.json({ ...returned, token: null });
+      }
     }),
+  },
+  advanced: {
+    ipAddress: {
+      // IP klien untuk rate limit. Di Vercel kedua header ini ditimpa platform dengan satu IP
+      // klien (tidak bisa dipalsukan). x-vercel-forwarded-for tetap benar walau ada proxy lain
+      // di depan Vercel. Di luar Vercel, pastikan proxy menimpa header ini (doc/SECURITY.md §9).
+      ipAddressHeaders: ["x-vercel-forwarded-for", "x-forwarded-for"],
+    },
   },
   rateLimit: {
     enabled: true,

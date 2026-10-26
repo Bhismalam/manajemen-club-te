@@ -15,6 +15,7 @@ const MESSAGES: Record<string, string> = {
   ACCOUNT_TEMPORARILY_LOCKED:
     "Terlalu banyak percobaan gagal. Akun dikunci sementara, coba lagi nanti.",
   ADMIN_MFA_REQUIRED: "MFA wajib untuk akun admin dan tidak bisa dinonaktifkan.",
+  TOTP_CODE_REUSED: "Kode ini sudah dipakai. Tunggu kode berikutnya di aplikasi authenticator.",
 };
 
 // Error yang mengharuskan user mengulang login dari awal.

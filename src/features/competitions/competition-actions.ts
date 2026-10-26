@@ -21,6 +21,7 @@ import {
   setCompetitionStatus,
   updateCompetition,
 } from "@/services/competition-service";
+import { enforceRateLimit } from "@/services/rate-limit-service";
 
 // Admin & pelatih; kepemilikan event (coach hanya event buatannya) dicek di service.
 // Aksi yang mengubah halaman detail memanggil `refresh()`: data halaman terbaru ikut dalam
@@ -80,6 +81,7 @@ export async function requestAttachmentUploadAction(
   const parsed = attachmentRequestSchema.safeParse(input);
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
+    await enforceRateLimit("upload", actor.userId);
     return ok(await requestAttachmentUpload(actor, parsed.data));
   } catch (error) {
     return toActionError(error);

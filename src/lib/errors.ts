@@ -1,6 +1,12 @@
 // Kategori error aplikasi (doc/ARCHITECTURE.md §15).
 export type AppErrorCode =
-  "VALIDATION_ERROR" | "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "INTERNAL_ERROR";
+  | "VALIDATION_ERROR"
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "RATE_LIMITED"
+  | "INTERNAL_ERROR";
 
 export class AppError extends Error {
   constructor(

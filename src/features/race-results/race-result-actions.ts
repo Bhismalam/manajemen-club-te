@@ -8,6 +8,7 @@ import { requireActor } from "@/lib/permissions/actor";
 import { saveResultsSchema } from "@/lib/validations/race-results";
 import type { SaveResultsSummary } from "@/services/race-result-service";
 import { saveResults } from "@/services/race-result-service";
+import { enforceRateLimit } from "@/services/rate-limit-service";
 
 function summaryMessage({ created, updated, deleted }: SaveResultsSummary) {
   const parts = [
@@ -24,6 +25,7 @@ export async function saveResultsAction(input: unknown): Promise<ActionResult<Sa
   const parsed = saveResultsSchema.safeParse(input);
   if (!parsed.success) return validationFail(parsed.error.issues);
   try {
+    await enforceRateLimit("results", actor.userId);
     const summary = await saveResults(actor, parsed.data);
     refresh();
     return ok(summary, summaryMessage(summary));

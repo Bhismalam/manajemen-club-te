@@ -10,6 +10,7 @@ import { requireActor } from "@/lib/permissions/actor";
 import { rosterFileName } from "@/lib/registrations";
 import { exportFormatSchema } from "@/lib/validations/registrations";
 import { getRoster, recordRosterExport } from "@/services/competition-registration-service";
+import { enforceRateLimit } from "@/services/rate-limit-service";
 
 const CONTENT_TYPE = {
   xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -36,6 +37,7 @@ export async function GET(
   }
 
   try {
+    await enforceRateLimit("export", actor.userId);
     const now = new Date();
     const data = toRosterExport(await getRoster(actor, id), now);
     const body =
@@ -54,7 +56,14 @@ export async function GET(
     });
   } catch (error) {
     if (!isAppError(error)) throw error;
-    const status = error.code === "NOT_FOUND" ? 404 : error.code === "FORBIDDEN" ? 403 : 400;
+    const status =
+      error.code === "NOT_FOUND"
+        ? 404
+        : error.code === "FORBIDDEN"
+          ? 403
+          : error.code === "RATE_LIMITED"
+            ? 429
+            : 400;
     return NextResponse.json(fail(error.code, error.message), { status, headers: NO_STORE });
   }
 }
