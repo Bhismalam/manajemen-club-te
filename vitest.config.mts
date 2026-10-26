@@ -7,5 +7,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts"],
+    // Integration test punya config sendiri (vitest.integration.config.mts).
+    exclude: ["src/**/*.int.test.ts", "node_modules/**"],
   },
 });

@@ -49,3 +49,8 @@ next-env.d.ts
 /.windsurf/
 /.claude/skills/
 /skills-lock.json
+
+# Playwright
+/playwright-report/
+/test-results/
+/e2e/.auth/

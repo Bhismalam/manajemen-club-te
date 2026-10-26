@@ -46,6 +46,7 @@ Deployment:
 
 - `pnpm dev`: development server.
 - `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm test`, atau sekaligus `pnpm check`.
+- `pnpm test:integration` (service ke database `*_test`), `pnpm test:e2e` (Playwright), `pnpm test:all`. Lihat `doc/TESTING.md`; test tidak pernah memakai database development.
 - `pnpm build`: production build.
 - `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:seed`, `pnpm db:reset`, `pnpm db:studio`.
 - `pnpm mfa:reset --email <email> --reason "..." --yes`: reset MFA darurat dari server.

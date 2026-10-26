@@ -281,16 +281,19 @@ Gunakan:
 
 ## PHASE 16 — Testing
 
-- [ ] Unit test critical services.
-- [ ] Permission test.
-- [ ] PB update test.
-- [ ] Auth test.
-- [ ] MFA test.
-- [ ] Registration service test.
-- [ ] Export test (isi Excel/PDF sesuai data).
-- [ ] Form validation test.
-- [ ] Mobile responsive test.
-- [ ] Browser test.
+Lihat `doc/TESTING.md`. Total: 149 unit, 33 integration, 36 E2E.
+
+- [x] Infrastruktur: database test terpisah (`*_test`, dibuat & dimigrasi otomatis), factory, `pnpm test:integration`, `pnpm test:e2e` (Playwright, production build port 3100), `pnpm test:all`.
+- [x] Unit test critical services (integration: pendaftaran, PB, hasil lomba, evaluasi, event, absensi, rate limit).
+- [x] Permission test (unit `policies`/`scopes` + integration RBAC/IDOR + E2E matriks akses).
+- [x] PB update test (time trial & hasil lomba, koreksi/hapus, DNS).
+- [x] Auth test (login, logout, wajib ganti password awal, token tidak di body).
+- [x] MFA test (admin wajib MFA, TOTP replay ditolak, recovery code sekali pakai).
+- [x] Registration service test.
+- [x] Export test (isi Excel/PDF sesuai data, formula injection).
+- [x] Form validation test (unit schema Zod: event, evaluasi, latihan, hasil lomba; E2E pesan login salah).
+- [x] Mobile responsive test (viewport HP, 3 role + publik, tanpa scroll horizontal).
+- [x] Browser test (alur pendaftaran → rekap → unduh Excel; website publik).
 
 ## PHASE 17 — Deployment
 
