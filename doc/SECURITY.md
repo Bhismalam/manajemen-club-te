@@ -247,11 +247,10 @@ Allowed (dokumen event):
 - `Cache-Control: no-store` pada response.
 - Setiap export dicatat di audit log (siapa, event apa, format, waktu).
 
-## 12.2 Website Publik
+## 12.2 Aplikasi Privat
 
-- Hanya data publik/agregat: jumlah atlet/pelatih/kelompok, nama & spesialisasi pelatih, kelompok latihan, event terbit (bukan DRAFT/CANCELLED), dan rekap medali per event.
-- **Tidak** menampilkan nama atlet, nomor atlet, tanggal lahir, kontak pribadi, atau PDF event (PDF hanya untuk anggota yang login). Menampilkan nama atlet di halaman publik memerlukan persetujuan atlet/orang tua dan flag khusus (belum ada).
-- Pendaftaran event tetap lewat akun anggota (`/login`).
+- Tidak ada website publik: semua data hanya untuk anggota yang login. `/` → `/dashboard` → login.
+- `robots.txt` (`Disallow: /`) dan meta `robots: noindex, nofollow` agar aplikasi tidak muncul di mesin pencari.
 
 ## 13. Sensitive Data
 
@@ -312,7 +311,7 @@ Detail teknis masuk logs.
 Diset untuk semua route di `next.config.ts` (`headers()`):
 
 - `Content-Security-Policy`: `default-src 'self'`, `script-src 'self' 'unsafe-inline'` (+`'unsafe-eval'` hanya dev), `connect-src 'self'` + origin Supabase (upload PDF langsung dari browser), `img-src 'self' data: blob:` + Supabase, `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`, `upgrade-insecure-requests` (HTTPS saja).
-  - Tanpa nonce: nonce memaksa semua halaman dinamis dan mematikan halaman statis/PPR (website publik, shell dashboard). Konsekuensinya skrip inline tetap diizinkan; CSP tetap memblokir skrip/koneksi ke domain lain, framing, plugin, dan perubahan `<base>`/`form action`.
+  - Tanpa nonce: nonce memaksa semua halaman dinamis dan mematikan halaman statis/PPR (shell dashboard, halaman login). Konsekuensinya skrip inline tetap diizinkan; CSP tetap memblokir skrip/koneksi ke domain lain, framing, plugin, dan perubahan `<base>`/`form action`.
 - `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (kamera, mikrofon, lokasi, dll. dimatikan), `Cross-Origin-Opener-Policy: same-origin`.
 - `Strict-Transport-Security` (2 tahun, includeSubDomains) saat `BETTER_AUTH_URL` HTTPS.
 - Header `X-Powered-By` dimatikan.

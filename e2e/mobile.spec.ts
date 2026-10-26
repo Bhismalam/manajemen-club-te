@@ -14,7 +14,7 @@ async function expectNoHorizontalScroll(page: Page, path: string) {
 }
 
 const PAGES = {
-  public: ["/", "/programs", "/events", "/contact"],
+  guest: ["/login", "/forgot-password"],
   athlete: [
     "/athlete",
     "/athlete/events",
@@ -27,12 +27,8 @@ const PAGES = {
 } as const;
 
 test.describe("tampilan HP", () => {
-  test("halaman publik + menu mobile", async ({ page }) => {
-    for (const path of PAGES.public) await expectNoHorizontalScroll(page, path);
-    await page.goto("/");
-    await page.getByRole("button", { name: "Buka menu" }).click();
-    await page.getByRole("dialog").getByRole("link", { name: "Program" }).click();
-    await expect(page).toHaveURL(/\/programs$/);
+  test("halaman login", async ({ page }) => {
+    for (const path of PAGES.guest) await expectNoHorizontalScroll(page, path);
   });
 
   for (const role of ["athlete", "coach", "admin"] as const) {

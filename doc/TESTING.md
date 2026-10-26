@@ -37,13 +37,12 @@ Modul `server-only` diganti stub (`vitest.integration.config.mts`) dan env Supab
 - `e2e/global.setup.ts` login semua role, mengaktifkan MFA admin seed lewat API, dan menyimpan session ke `e2e/.auth/` (di-ignore git).
 - Setiap konteks API memakai IP klien sendiri (`x-forwarded-for`) agar rate limit login per IP tidak saling mengganggu.
 
-| Spec                   | Cakupan                                                                                                                                         |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `auth.spec.ts`         | Login salah/benar, logout, wajib ganti password awal, token tidak di body, MFA admin, TOTP replay, recovery code sekali pakai, admin tanpa MFA. |
-| `access.spec.ts`       | Matriks akses tamu/atlet/pelatih/admin, IDOR (atlet non-binaan, event DRAFT & PDF-nya, export admin).                                           |
-| `registration.spec.ts` | Atlet mendaftar event → notifikasi & rekap admin → isi file Excel hasil unduhan.                                                                |
-| `public.spec.ts`       | Halaman publik tampil tanpa data pribadi atlet, header keamanan.                                                                                |
-| `mobile.spec.ts`       | Viewport HP: tidak ada scroll horizontal di halaman publik & dashboard 3 role, menu mobile, navigasi bawah atlet.                               |
+| Spec                   | Cakupan                                                                                                                                                                           |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.spec.ts`         | Login salah/benar, logout, wajib ganti password awal, token tidak di body, MFA admin, TOTP replay, recovery code sekali pakai, admin tanpa MFA.                                   |
+| `access.spec.ts`       | Matriks akses tamu/atlet/pelatih/admin (termasuk `/` → login/dashboard), IDOR (atlet non-binaan, event DRAFT & PDF-nya, export admin), header keamanan, `robots.txt` + `noindex`. |
+| `registration.spec.ts` | Atlet mendaftar event → notifikasi & rekap admin → isi file Excel hasil unduhan.                                                                                                  |
+| `mobile.spec.ts`       | Viewport HP: tidak ada scroll horizontal di halaman login & dashboard 3 role, navigasi bawah atlet.                                                                               |
 
 Laporan HTML: `pnpm exec playwright show-report`. Saat gagal, screenshot & trace ada di `test-results/`.
 

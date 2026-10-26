@@ -33,6 +33,11 @@ const ownAthleteId = () =>
 
 test.describe("RBAC", () => {
   const cases: [Role, string, string][] = [
+    // Tanpa website publik: beranda langsung ke login / dashboard sesuai role.
+    [null, "/", "/login"],
+    ["athlete", "/", "/athlete"],
+    ["coach", "/", "/coach"],
+    ["admin", "/", "/admin"],
     [null, "/admin", "/login"],
     [null, "/coach", "/login"],
     [null, "/athlete", "/login"],
@@ -85,5 +90,21 @@ test.describe("IDOR", () => {
     expect(res.status()).toBe(307);
     expect(res.headers().location).toMatch(/\/coach$/);
     await context.close();
+  });
+});
+
+test.describe("aplikasi privat", () => {
+  test("header keamanan terpasang", async ({ request }) => {
+    const headers = (await request.get("/login")).headers();
+    expect(headers["content-security-policy"]).toContain("frame-ancestors 'none'");
+    expect(headers["x-frame-options"]).toBe("DENY");
+    expect(headers["x-content-type-options"]).toBe("nosniff");
+    expect(headers["x-powered-by"]).toBeUndefined();
+  });
+
+  test("tidak diindeks mesin pencari", async ({ request, page }) => {
+    expect(await (await request.get("/robots.txt")).text()).toContain("Disallow: /");
+    await page.goto("/login");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
   });
 });

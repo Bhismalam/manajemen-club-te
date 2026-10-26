@@ -11,7 +11,6 @@ Karakter visual:
 - Energetic.
 - Data-oriented.
 
-Website publik lebih emosional dan visual.
 Dashboard lebih fokus pada efisiensi dan readability.
 
 ## 2. Design Principles
@@ -331,22 +330,7 @@ Prioritas mobile:
 
 ## 17. Public Website
 
-Komponen (`src/components/public`): `SiteHeader` (navbar, sheet di mobile, garis aqua di bawah item aktif), `SiteFooter` (latar navy), `PageIntro` + `LaneLines` (garis lintasan & marka "T" putih transparan, tanpa foto), `Section`, `CoachCard` (inisial), `PublicEventCard`, `MedalCounts`, `CtaBand` (WhatsApp).
-
-### Homepage
-
-Urutan:
-
-1. Hero.
-2. Club intro.
-3. Programs.
-4. Why join.
-5. Coaches.
-6. Achievements.
-7. Upcoming events.
-8. Gallery.
-9. CTA.
-10. Footer.
+Tidak ada (dihapus dari scope Okt 2026). Halaman tanpa login hanya login, lupa/reset password, dan 404.
 
 ## 18. UX States
 

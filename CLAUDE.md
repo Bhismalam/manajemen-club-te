@@ -86,7 +86,6 @@ Contoh:
 ```text
 src/
 ├── app/
-│   ├── (public)/
 │   ├── (auth)/
 │   ├── admin/
 │   ├── coach/

@@ -248,20 +248,10 @@ Gunakan:
 - [x] Wajib ganti password saat login pertama / setelah password sementara (`User.mustChangePassword`, halaman `/settings/change-password`).
 - [x] Admin membuat password sementara untuk pengguna yang lupa password (sesi dicabut, audit `user.password_reset`).
 
-## PHASE 14 — Public Website
+## PHASE 14 — Public Website (dihapus dari scope)
 
-- [x] Home (hero + statistik klub, tentang, program, alasan bergabung, pelatih, prestasi, event mendatang, galeri, CTA WhatsApp).
-- [x] About (cerita, statistik, visi & misi, tempat latihan).
-- [x] Programs (program dari `src/constants/site.ts` + kelompok latihan aktif dari database).
-- [x] Coaches (nama, spesialisasi, kelompok; tanpa kontak pribadi).
-- [x] Achievements (rekap medali per kejuaraan, agregat tanpa nama atlet).
-- [x] Events (akan datang / sudah berlangsung, status pendaftaran, "Masuk untuk mendaftar").
-- [x] Gallery (dari `SITE.gallery`; menu disembunyikan selama belum ada foto).
-- [x] Contact (alamat + maps, WhatsApp, email, Instagram, jam layanan).
-- [x] Responsive navbar (menu samping di mobile, penanda halaman aktif).
-- [x] Footer.
-- [x] Data publik di-cache (`use cache` + `cacheLife("minutes")`): halaman dirender statis dan diperbarui ±1 menit.
-- [ ] Isi konten klub yang sebenarnya di `src/constants/site.ts` (nama, alamat, kontak, program, foto galeri). Saat ini masih contoh.
+- [x] Sempat dibuat (commit `fa7c380`), lalu dihapus karena aplikasi khusus anggota satu klub.
+- [x] `/` diarahkan ke `/dashboard` (login bila belum masuk), `robots.txt` menolak semua crawler, meta `noindex`.
 
 ## PHASE 15 — Security
 
@@ -281,7 +271,7 @@ Gunakan:
 
 ## PHASE 16 — Testing
 
-Lihat `doc/TESTING.md`. Total: 149 unit, 33 integration, 36 E2E.
+Lihat `doc/TESTING.md`. Total: 149 unit, 33 integration, 34 E2E (setelah website publik dihapus).
 
 - [x] Infrastruktur: database test terpisah (`*_test`, dibuat & dimigrasi otomatis), factory, `pnpm test:integration`, `pnpm test:e2e` (Playwright, production build port 3100), `pnpm test:all`.
 - [x] Unit test critical services (integration: pendaftaran, PB, hasil lomba, evaluasi, event, absensi, rate limit).
@@ -292,8 +282,8 @@ Lihat `doc/TESTING.md`. Total: 149 unit, 33 integration, 36 E2E.
 - [x] Registration service test.
 - [x] Export test (isi Excel/PDF sesuai data, formula injection).
 - [x] Form validation test (unit schema Zod: event, evaluasi, latihan, hasil lomba; E2E pesan login salah).
-- [x] Mobile responsive test (viewport HP, 3 role + publik, tanpa scroll horizontal).
-- [x] Browser test (alur pendaftaran → rekap → unduh Excel; website publik).
+- [x] Mobile responsive test (viewport HP, login + 3 role, tanpa scroll horizontal).
+- [x] Browser test (alur pendaftaran → rekap → unduh Excel).
 
 ## PHASE 17 — Deployment
 

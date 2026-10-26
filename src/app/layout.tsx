@@ -26,6 +26,8 @@ export const metadata: Metadata = {
     template: "%s · Swim & Finswimming Club",
   },
   description: "Sistem manajemen klub renang dan finswimming.",
+  // Aplikasi privat untuk anggota klub: jangan diindeks mesin pencari.
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

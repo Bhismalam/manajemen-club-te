@@ -6,7 +6,6 @@ Swim & Finswimming Club Management System adalah platform berbasis web untuk men
 
 Platform memiliki:
 
-- Website publik klub.
 - Dashboard Admin.
 - Dashboard Pelatih.
 - Dashboard Atlet.
@@ -22,7 +21,7 @@ Tujuan utama sistem:
 3. Membantu pelatih memonitor perkembangan atlet secara terstruktur.
 4. Memberikan akses mandiri kepada atlet untuk melihat perkembangan performanya.
 5. Membantu admin mengelola operasional klub.
-6. Menjadi website resmi klub untuk branding dan informasi publik.
+6. Aplikasi privat khusus anggota satu klub (tanpa website publik; diputuskan Okt 2026).
 
 ## 3. Target Pengguna
 
@@ -37,10 +36,6 @@ Bertanggung jawab terhadap latihan, absensi, time trial, hasil lomba, dan evalua
 ### Atlet
 
 Dapat melihat profil, jadwal, hasil latihan, personal best, histori lomba, dan evaluasi pelatih, serta mendaftarkan diri ke event mendatang.
-
-### Pengunjung Publik
-
-Dapat melihat informasi umum klub tanpa login.
 
 ## 4. Scope MVP
 
@@ -270,19 +265,9 @@ Atlet hanya dapat melihat evaluasi miliknya.
 - Evaluasi terbaru.
 - Progress performa.
 
-### 4.13 Website Publik
+### 4.13 Website Publik — dihapus dari scope
 
-Halaman:
-
-- Home.
-- About Club.
-- Program.
-- Coaches.
-- Athlete Highlights.
-- Achievements.
-- Events.
-- Gallery.
-- Contact.
+Aplikasi dipakai khusus anggota satu klub, jadi tidak ada halaman publik. Alamat `/` langsung ke login / dashboard, dan aplikasi tidak diindeks mesin pencari. Implementasi website publik sempat dibuat (commit `fa7c380`) lalu dihapus; bisa dikembalikan dari riwayat Git bila diperlukan.
 
 ## 5. Non-MVP / Phase 2
 
@@ -346,7 +331,6 @@ MVP dianggap selesai jika:
 - Atlet dapat melihat data pribadi miliknya.
 - Personal best dapat diperbarui otomatis.
 - Hasil lomba tercatat.
-- Website publik tersedia.
 - Tidak ada akses lintas atlet terhadap data privat.
 - Sistem responsif di desktop dan mobile.
 
@@ -381,7 +365,6 @@ P1:
 
 P2:
 
-- Public website.
 - Dashboard analytics.
 - Notification.
 - Reporting.

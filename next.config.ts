@@ -60,6 +60,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  // Aplikasi khusus anggota klub (tanpa website publik): beranda langsung ke dashboard,
+  // yang mengarahkan ke login bila belum masuk.
+  async redirects() {
+    return [{ source: "/", destination: "/dashboard", permanent: false }];
+  },
   turbopack: {
     rules: {
       "*.css": {
