@@ -44,6 +44,10 @@ export default defineConfig({
     url: `${baseURL}/login`,
     timeout: 300_000,
     reuseExistingServer: false,
-    env: { DATABASE_URL: TEST_DATABASE_URL, BETTER_AUTH_URL: baseURL },
+    env: {
+      DATABASE_URL: TEST_DATABASE_URL,
+      DIRECT_URL: TEST_DATABASE_URL,
+      BETTER_AUTH_URL: baseURL,
+    },
   },
 });

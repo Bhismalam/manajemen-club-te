@@ -38,6 +38,7 @@ export function resetAndSeedDatabase() {
   const env = {
     ...process.env,
     DATABASE_URL: TEST_DATABASE_URL,
+    DIRECT_URL: TEST_DATABASE_URL,
     NODE_ENV: "development",
   } as NodeJS.ProcessEnv;
   execSync("pnpm exec prisma migrate deploy", { env, stdio: "pipe" });

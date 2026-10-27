@@ -432,17 +432,18 @@ Microservices hanya dipertimbangkan jika ada kebutuhan nyata.
 
 ## 17. Deployment
 
-Production:
+Production (langkah lengkap: `doc/DEPLOYMENT.md`):
 
-- Frontend/backend: Vercel.
-- Database: Supabase PostgreSQL / Neon / managed PostgreSQL.
-- Storage: Supabase Storage / Cloudinary.
+- Frontend/backend: Vercel, region `sin1`, production branch `main`.
+- Database: Supabase PostgreSQL. Aplikasi lewat transaction pooler (`DATABASE_URL`), migrasi lewat session pooler (`DIRECT_URL`), TLS diverifikasi dengan `DATABASE_CA_CERT` (`src/lib/db/pg-config.ts`).
+- Storage: Supabase Storage (project yang sama).
+- Build: script `vercel-build` menjalankan `prisma migrate deploy` + data master hanya bila `VERCEL_ENV=production`, lalu `next build`.
 
 Environment:
 
-- development.
-- staging.
-- production.
+- development: PostgreSQL lokal, `.env.local`.
+- test: database `*_test` terpisah (`doc/TESTING.md`).
+- production: env di Vercel; admin pertama dibuat dengan `pnpm admin:create`.
 
 ## 18. Backup
 

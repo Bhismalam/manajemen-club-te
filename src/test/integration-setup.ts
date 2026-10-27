@@ -6,6 +6,7 @@ import { testDatabaseUrl } from "./test-database";
 // Sebelum modul aplikasi di-import: arahkan Prisma ke database test.
 config({ path: [".env.local", ".env"], quiet: true });
 process.env.DATABASE_URL = testDatabaseUrl();
+process.env.DIRECT_URL = process.env.DATABASE_URL;
 // Storage tidak dipakai di integration test (tidak ada panggilan ke Supabase).
 delete process.env.SUPABASE_URL;
 delete process.env.SUPABASE_SERVICE_ROLE_KEY;

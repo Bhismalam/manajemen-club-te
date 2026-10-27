@@ -12,6 +12,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { config } from "dotenv";
 
 import { PrismaClient } from "../src/generated/prisma/client";
+import { pgConfig } from "../src/lib/db/pg-config";
 import { resetUserMfa } from "../src/services/mfa-service";
 
 config({ path: [".env.local", ".env"], quiet: true });
@@ -35,7 +36,7 @@ async function main() {
 
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error("DATABASE_URL is not set");
-  const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: databaseUrl }) });
+  const prisma = new PrismaClient({ adapter: new PrismaPg(pgConfig(databaseUrl)) });
 
   try {
     const user = await prisma.user.findUnique({

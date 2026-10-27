@@ -21,7 +21,8 @@ export default async function setup() {
   await client.end();
 
   execSync("pnpm exec prisma migrate deploy", {
-    env: { ...process.env, DATABASE_URL: url },
+    // DIRECT_URL juga diarahkan ke database test (prisma.config.ts memprioritaskannya).
+    env: { ...process.env, DATABASE_URL: url, DIRECT_URL: url },
     stdio: "pipe",
   });
 }

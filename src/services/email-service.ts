@@ -7,9 +7,14 @@ export type EmailMessage = {
 };
 
 // Provider email belum dipilih (lihat doc/TASK.md). Di development, email "dikirim"
-// ke log server agar alur reset password tetap bisa diuji.
+// ke log server agar alur reset password tetap bisa diuji. Di production belum ada pengiriman
+// email: lupa password ditangani admin lewat "Buat password sementara".
+export function isEmailEnabled(): boolean {
+  return process.env.NODE_ENV !== "production";
+}
+
 export async function sendEmail(message: EmailMessage): Promise<void> {
-  if (process.env.NODE_ENV === "production") {
+  if (!isEmailEnabled()) {
     throw new Error("EMAIL_PROVIDER_NOT_CONFIGURED");
   }
 

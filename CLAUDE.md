@@ -51,6 +51,9 @@ Deployment:
 - `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:seed`, `pnpm db:reset`, `pnpm db:studio`.
 - `pnpm mfa:reset --email <email> --reason "..." --yes`: reset MFA darurat dari server.
 - `pnpm storage:setup`: buat/selaraskan bucket Supabase Storage (idempoten).
+- `pnpm db:seed:master`: data master (nomor lomba) tanpa data demo, aman untuk produksi.
+- `pnpm admin:create --email … --name "…" [--env .env.production.local]`: buat admin pertama.
+- Deploy: lihat `doc/DEPLOYMENT.md` (Vercel menjalankan `vercel-build`: migrasi + data master hanya di production).
 
 ## 2. Coding Principles
 

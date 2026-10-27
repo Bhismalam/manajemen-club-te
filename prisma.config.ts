@@ -11,6 +11,8 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: env("DATABASE_URL"),
+    // Migrasi memakai koneksi langsung (DIRECT_URL) bila ada, karena pooler mode transaksi
+    // (Supabase port 6543) tidak cocok untuk migrasi. Runtime aplikasi tetap DATABASE_URL.
+    url: process.env.DIRECT_URL || env("DATABASE_URL"),
   },
 });

@@ -287,16 +287,20 @@ Lihat `doc/TESTING.md`. Total: 149 unit, 33 integration, 34 E2E (setelah website
 
 ## PHASE 17 — Deployment
 
-- [ ] Setup production DB.
-- [ ] Setup Vercel.
-- [ ] Environment variables (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, email provider).
-- [ ] Migration production.
-- [ ] Seed admin (wajib setup MFA saat login pertama).
-- [ ] Setup bucket storage privat untuk PDF event.
-- [ ] Setup domain.
+Panduan langkah demi langkah: `doc/DEPLOYMENT.md`.
+
+- [x] Persiapan kode: `vercel-build` (migrasi + data master hanya di production), `DIRECT_URL` untuk migrasi, TLS Supabase via `DATABASE_CA_CERT`, region `sin1`, `pnpm admin:create`, `pnpm db:seed:master`, halaman lupa password tanpa email.
+- [ ] Setup production DB (Supabase Postgres: connection string pooler + sertifikat CA).
+- [ ] Setup Vercel (import repo, production branch `main`).
+- [ ] Environment variables (`DATABASE_URL`, `DIRECT_URL`, `DATABASE_CA_CERT`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`).
+- [ ] Migration production (otomatis saat build production; cek log).
+- [ ] Seed admin (`pnpm admin:create --env .env.production.local …`; wajib ganti password & setup MFA saat login pertama).
+- [x] Setup bucket storage privat untuk PDF event (`private-docs`, Phase 10).
+- [ ] Setup domain (opsional; awalnya `*.vercel.app`).
 - [ ] HTTPS verification.
-- [ ] Error monitoring.
-- [ ] Backup verification.
+- [ ] Error monitoring (Vercel Logs; Sentry opsional nanti).
+- [ ] Backup verification (Supabase Free tanpa backup otomatis: ekspor berkala / paket Pro).
+- [ ] Layanan email untuk lupa password (post-MVP; sementara password sementara dari admin).
 
 ## PHASE 18 — Post MVP
 
