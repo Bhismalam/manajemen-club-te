@@ -5,11 +5,13 @@ import {
   canEditEvaluation,
   canEditTimeTrial,
   canExportRegistrations,
+  canManageAthletePayment,
   canManageAthletePerformance,
   canManageCompetition,
   canManageTrainingGroup,
   canManageUsers,
   canRegisterAthlete,
+  canSetSppRate,
   canViewAthlete,
   canViewCompetition,
   canViewRegistration,
@@ -284,5 +286,21 @@ describe("registrations", () => {
     expect(canExportRegistrations(admin)).toBe(true);
     expect(canExportRegistrations(coachA)).toBe(false);
     expect(canExportRegistrations(athlete1User)).toBe(false);
+  });
+});
+
+describe("SPP", () => {
+  it("hanya admin yang mengatur tarif", () => {
+    expect(canSetSppRate(admin)).toBe(true);
+    expect(canSetSppRate(coachA)).toBe(false);
+    expect(canSetSppRate(athlete1User)).toBe(false);
+  });
+
+  it("admin semua atlet, pelatih hanya binaan, atlet tidak bisa mengelola", () => {
+    expect(canManageAthletePayment(admin, ath2)).toBe(true);
+    expect(canManageAthletePayment(coachA, ath1)).toBe(true);
+    expect(canManageAthletePayment(coachA, ath2)).toBe(false);
+    expect(canManageAthletePayment(coachNoProfile, ath3NoGroup)).toBe(false);
+    expect(canManageAthletePayment(athlete1User, ath1)).toBe(false);
   });
 });

@@ -14,6 +14,7 @@ import { listAthleteEvents } from "@/services/competition-registration-service";
 import { listEvaluations } from "@/services/evaluation-service";
 import { getDisciplineProgress, listPersonalBests } from "@/services/personal-best-service";
 import { listAthleteRaceHistory } from "@/services/race-result-service";
+import { getAthleteSppHistory, getSppOverview } from "@/services/spp-service";
 import { getUserCounts } from "@/services/user-admin-service";
 
 // Data ringkasan per role (doc/PRD.md §4.12). Semua query memakai scope actor.
@@ -48,7 +49,7 @@ export async function getAdminDashboard(actor: Actor, now = new Date()) {
   const { today, start, end } = clubToday(now);
   const since = new Date(start.getTime() - 30 * DAY_MS);
 
-  const [counts, sessions, events, attendance, activity] = await Promise.all([
+  const [counts, sessions, events, attendance, activity, spp] = await Promise.all([
     getUserCounts(),
     prisma.trainingSession.findMany({
       where: { AND: [trainingSessionScope(actor), { startsAt: { gte: start } }] },
@@ -86,6 +87,7 @@ export async function getAdminDashboard(actor: Actor, now = new Date()) {
       take: 6,
       select: { id: true, action: true, createdAt: true, actor: { select: { name: true } } },
     }),
+    getSppOverview(actor, now),
   ]);
 
   const groups = new Map<
@@ -114,6 +116,7 @@ export async function getAdminDashboard(actor: Actor, now = new Date()) {
         .sort((a, b) => a.name.localeCompare(b.name, "id")),
     },
     activity,
+    spp,
   };
 }
 
@@ -124,7 +127,7 @@ export async function getAdminDashboard(actor: Actor, now = new Date()) {
 export async function getCoachDashboard(actor: Actor, now = new Date()) {
   const { today, start, end } = clubToday(now);
 
-  const [athletes, todaySessions, upcomingSessions, recentTrials, monthPbs, events] =
+  const [athletes, todaySessions, upcomingSessions, recentTrials, monthPbs, events, spp] =
     await Promise.all([
       listCoachAthletes(actor),
       prisma.trainingSession.findMany({
@@ -190,6 +193,7 @@ export async function getCoachDashboard(actor: Actor, now = new Date()) {
           },
         },
       }),
+      getSppOverview(actor, now),
     ]);
 
   return {
@@ -200,6 +204,7 @@ export async function getCoachDashboard(actor: Actor, now = new Date()) {
     recentTrials,
     monthPbs,
     events,
+    spp,
   };
 }
 
@@ -211,7 +216,7 @@ export async function getAthleteDashboard(actor: Actor, now = new Date()) {
   const athleteId = actor.athleteId;
   if (!athleteId) return null;
 
-  const [nextSession, pbs, latestTrial, attendance, events, history, evaluations] =
+  const [nextSession, pbs, latestTrial, attendance, events, history, evaluations, spp] =
     await Promise.all([
       prisma.trainingSession.findFirst({
         where: { AND: [trainingSessionScope(actor), { endsAt: { gte: now } }] },
@@ -234,6 +239,7 @@ export async function getAthleteDashboard(actor: Actor, now = new Date()) {
       listAthleteEvents(actor, now),
       listAthleteRaceHistory(athleteId),
       listEvaluations(actor, { athlete: "", page: 1 }),
+      getAthleteSppHistory(actor, athleteId, now),
     ]);
 
   // Grafik: nomor dari time trial terakhir, atau PB terbaru.
@@ -264,5 +270,6 @@ export async function getAthleteDashboard(actor: Actor, now = new Date()) {
     medals: history.medals,
     latestEvaluation: evaluations.items[0] ?? null,
     progress: progress && progress.results.length >= 2 ? progress : null,
+    spp,
   };
 }

@@ -14,6 +14,7 @@ import {
   UserRound,
   Users,
   UsersRound,
+  Wallet,
   Waves,
 } from "lucide-react";
 
@@ -48,6 +49,7 @@ export const ROLE_NAV: Record<UserRole, RoleNav> = {
       { href: "/admin/time-trials", label: "Time Trial", icon: Timer },
       { href: "/admin/competitions", label: "Event", icon: Trophy },
       { href: "/admin/results", label: "Hasil Lomba", icon: Medal },
+      { href: "/admin/spp", label: "SPP", icon: Wallet },
       { href: "/admin/users", label: "Pengguna", icon: ShieldUser },
     ],
   },
@@ -63,6 +65,7 @@ export const ROLE_NAV: Record<UserRole, RoleNav> = {
       { href: "/coach/competitions", label: "Event", icon: Trophy },
       { href: "/coach/results", label: "Hasil Lomba", icon: Medal },
       { href: "/coach/evaluations", label: "Evaluasi", icon: ClipboardList },
+      { href: "/coach/spp", label: "SPP", icon: Wallet },
     ],
   },
   ATHLETE: {
@@ -76,6 +79,7 @@ export const ROLE_NAV: Record<UserRole, RoleNav> = {
       { href: "/athlete/time-trials", label: "Time Trial", icon: Timer },
       { href: "/athlete/results", label: "Riwayat Lomba", icon: History },
       { href: "/athlete/evaluations", label: "Evaluasi", icon: ClipboardList },
+      { href: "/athlete/spp", label: "SPP", icon: Wallet },
       { href: "/athlete/profile", label: "Profil", icon: UserRound, mobile: true },
     ],
   },

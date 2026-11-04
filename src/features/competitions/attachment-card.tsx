@@ -7,29 +7,13 @@ import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { checkPdfFile, PDF_MIME_TYPE } from "@/lib/storage/pdf";
+import { uploadToSignedUrl } from "@/lib/storage/upload-client";
 
 import {
   confirmAttachmentUploadAction,
   removeAttachmentAction,
   requestAttachmentUploadAction,
 } from "./competition-actions";
-
-// Unggah langsung ke signed URL Supabase (tidak melewati server aplikasi), dengan progres.
-function uploadToSignedUrl(url: string, file: File, onProgress: (percent: number) => void) {
-  return new Promise<void>((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("PUT", url);
-    xhr.setRequestHeader("Content-Type", PDF_MIME_TYPE);
-    xhr.setRequestHeader("x-upsert", "false");
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100));
-    };
-    xhr.onload = () =>
-      xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(String(xhr.status)));
-    xhr.onerror = () => reject(new Error("network"));
-    xhr.send(file);
-  });
-}
 
 export function AttachmentCard({
   competitionId,
@@ -67,7 +51,7 @@ export function AttachmentCard({
         return;
       }
       try {
-        await uploadToSignedUrl(request.data.signedUrl, file, setProgress);
+        await uploadToSignedUrl(request.data.signedUrl, file, PDF_MIME_TYPE, setProgress);
       } catch {
         toast.error("Upload gagal. Periksa koneksi lalu coba lagi.");
         return;

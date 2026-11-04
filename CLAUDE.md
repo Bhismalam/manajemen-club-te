@@ -113,6 +113,7 @@ src/
 │   ├── competition-registrations/
 │   ├── exports/
 │   ├── notifications/
+│   ├── spp/
 │   └── evaluations/
 │
 ├── lib/
@@ -142,6 +143,7 @@ Boleh:
 - Manage competition.
 - Melihat semua pendaftar event dan export Excel/PDF.
 - Mengubah/membatalkan pendaftaran kapan saja.
+- Mengatur tarif SPP, mencatat dan mengonfirmasi SPP semua atlet.
 - View system-wide data.
 
 Wajib:
@@ -159,6 +161,7 @@ Boleh:
 - Manage race result.
 - Create evaluation.
 - Mendaftarkan atlet binaan ke event (sebelum deadline).
+- Mencatat dan mengonfirmasi SPP atlet binaan.
 - Membuat event dan mengelola event buatannya sendiri (PRD §4.9.1).
 
 Tidak boleh:
@@ -181,10 +184,12 @@ Boleh:
 - Melihat evaluasi sendiri.
 - Melihat event dan mengunduh PDF event.
 - Mendaftarkan diri sendiri ke event, mengubah, atau membatalkannya sebelum deadline.
+- Melihat SPP sendiri dan mengunggah bukti pembayaran.
 
 Tidak boleh:
 
 - Mengubah hasil performa.
+- Menandai SPP sendiri sebagai lunas.
 - Melihat data privat atlet lain.
 - Mendaftarkan atlet lain.
 

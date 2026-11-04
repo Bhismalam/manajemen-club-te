@@ -1,7 +1,6 @@
 import "server-only";
 
 import type { Prisma } from "@/generated/prisma/client";
-import type { NotificationType } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/db/prisma";
 import { AppError } from "@/lib/errors";
 import { toClubDateInput } from "@/lib/format";
@@ -16,6 +15,7 @@ import { diffDisciplines, exceedsEntryLimit, registrationDenyMessage } from "@/l
 import { dateOnly } from "@/lib/validations/common";
 import type { RosterFilter } from "@/lib/validations/registrations";
 import { writeAuditLog } from "@/services/audit-log-service";
+import { notifyAdmins } from "@/services/notification-service";
 
 // Pendaftaran event (doc/PRD.md §4.9.2). Satu registration per atlet per event,
 // berisi satu atau lebih CompetitionEntry (nomor lomba + seed time dari PB).
@@ -249,27 +249,6 @@ async function authorize(
   return { competition, athlete };
 }
 
-async function notifyAdmins(
-  tx: Prisma.TransactionClient,
-  actor: Actor,
-  notification: { type: NotificationType; title: string; message: string; competitionId: string },
-) {
-  const admins = await tx.user.findMany({
-    where: { role: "ADMIN", status: "ACTIVE", deletedAt: null, id: { not: actor.userId } },
-    select: { id: true },
-  });
-  if (admins.length === 0) return;
-  await tx.notification.createMany({
-    data: admins.map((admin) => ({
-      userId: admin.id,
-      type: notification.type,
-      title: notification.title,
-      message: notification.message,
-      linkUrl: rosterPath(notification.competitionId),
-    })),
-  });
-}
-
 function registeredByLabel(actor: Actor) {
   if (actor.role === "ATHLETE") return "mendaftar";
   return actor.role === "COACH" ? "didaftarkan pelatih" : "didaftarkan admin";
@@ -395,13 +374,13 @@ export async function saveRegistration(
         removed,
       },
     });
-    await notifyAdmins(tx, actor, {
+    await notifyAdmins(tx, actor.userId, {
       type: created ? "REGISTRATION_CREATED" : "REGISTRATION_UPDATED",
       title: created ? "Pendaftaran event baru" : "Pendaftaran event diubah",
       message: created
         ? `${athlete.fullName} ${registeredByLabel(actor)} ${input.disciplineIds.length} nomor di ${competition.name}.`
         : `${athlete.fullName} kini terdaftar di ${input.disciplineIds.length} nomor di ${competition.name}.`,
-      competitionId: competition.id,
+      linkUrl: rosterPath(competition.id),
     });
   });
 
@@ -449,11 +428,11 @@ export async function cancelRegistration(
       entityId: registration.id,
       metadata: { competitionId: competition.id, athleteId: athlete.id },
     });
-    await notifyAdmins(tx, actor, {
+    await notifyAdmins(tx, actor.userId, {
       type: "REGISTRATION_CANCELLED",
       title: "Pendaftaran event dibatalkan",
       message: `Pendaftaran ${athlete.fullName} di ${competition.name} dibatalkan.`,
-      competitionId: competition.id,
+      linkUrl: rosterPath(competition.id),
     });
   });
 }

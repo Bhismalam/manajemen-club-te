@@ -13,6 +13,7 @@ import { EvaluationCard } from "@/features/evaluations/evaluation-card";
 import { PersonalBestGrid } from "@/features/personal-bests/personal-best-card";
 import { ProgressChart } from "@/features/personal-bests/progress-chart";
 import { RaceHistory } from "@/features/race-results/race-history";
+import { AthleteSppCard } from "@/features/spp/spp-overview-card";
 import { formatDuration } from "@/lib/duration";
 import { CLUB_TIME_ZONE_LABEL, formatClubDate, formatTime, formatWeekdayDate } from "@/lib/format";
 import type { Actor } from "@/lib/permissions/types";
@@ -109,6 +110,8 @@ export async function AthleteDashboard({ actor, name }: { actor: Actor; name: st
           hint={`${medals.GOLD} emas · ${medals.SILVER} perak · ${medals.BRONZE} perunggu`}
         />
       </div>
+
+      <AthleteSppCard history={data.spp} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <SectionCard title="Lomba berikutnya" href="/athlete/events" linkLabel="Semua event">

@@ -238,6 +238,14 @@ Allowed (dokumen event):
 - Signed URL memakai opsi `download` sehingga Storage mengirim `Content-Disposition: attachment`; PDF tidak pernah disajikan dari domain aplikasi.
 - `SUPABASE_SERVICE_ROLE_KEY` hanya di server (`import "server-only"`), tidak pernah memakai prefix `NEXT_PUBLIC_`.
 
+Allowed (bukti pembayaran SPP):
+
+- Foto (JPG, PNG, WebP) atau PDF, maksimal 10 MB. SVG tidak diterima.
+- Bucket privat terpisah `payment-proofs`, karena berisi data keuangan.
+- Key dibuat server dan terikat pada atlet + bulan (`spp/{athleteId}/{YYYY-MM}/{uuid}.{ext}`). Untuk atlet, `athleteId` selalu dari session, sehingga key milik atlet lain ditolak.
+- Saat pembayaran disimpan, server memeriksa key, ukuran, dan magic bytes; objek yang tidak valid langsung dihapus.
+- Dilihat lewat `/api/spp/payments/[id]/proof` (`athleteScope`: admin semua, pelatih binaan, atlet miliknya) lalu redirect ke signed URL 5 menit, tanpa cache. File dibuka dari domain Supabase, bukan domain aplikasi. Object key tidak pernah dikirim ke browser.
+
 ## 12.1 Export Security (Excel/PDF)
 
 - Endpoint export hanya untuk ADMIN dengan MFA terverifikasi (`requireAdmin()`).

@@ -4,6 +4,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 import { AppError } from "@/lib/errors";
 
+import { PROOF_BUCKET } from "./payment-proof";
 import { PRIVATE_BUCKET } from "./pdf";
 
 // Supabase Storage hanya diakses dari server dengan service role key (melewati RLS).
@@ -30,4 +31,9 @@ function getClient(): SupabaseClient {
 // Bucket privat untuk dokumen (PDF event). Akses file selalu lewat signed URL berumur pendek.
 export function privateDocs() {
   return getClient().storage.from(PRIVATE_BUCKET);
+}
+
+// Bucket privat untuk bukti pembayaran SPP, dipisah dari dokumen event karena berisi data keuangan.
+export function paymentProofs() {
+  return getClient().storage.from(PROOF_BUCKET);
 }

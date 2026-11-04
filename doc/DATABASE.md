@@ -463,6 +463,26 @@ metadata
 createdAt
 ```
 
+### SppRate
+
+Tarif SPP klub. Tarif suatu bulan = baris terbaru dengan `effectiveMonth <= bulan`.
+
+- `amount` (Int, rupiah, > 0).
+- `effectiveMonth` (Date, tanggal 1, unik).
+- `createdById` → User.
+
+### SppPayment
+
+Satu baris per atlet per bulan (`@@unique([athleteId, period])`). `REJECTED`/`CANCELLED` dihitung belum bayar dan barisnya dipakai ulang saat diajukan lagi; tidak ada hard delete, riwayat ada di AuditLog.
+
+- `athleteId` → AthleteProfile, `period` (Date, tanggal 1).
+- `amount` (Int, rupiah, > 0): nominal saat dicatat.
+- `status`: `PENDING`, `PAID`, `REJECTED`, `CANCELLED`.
+- `method`: `CASH`, `TRANSFER`.
+- `paidOn` (Date), `note`.
+- `proofKey`, `proofName`: bukti di bucket privat `payment-proofs`.
+- `submittedById`, `reviewedById`, `reviewedAt`, `reviewNote` (alasan tolak/batal).
+
 ## 5. Relationships
 
 ```text

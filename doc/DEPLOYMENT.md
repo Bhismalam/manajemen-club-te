@@ -4,7 +4,7 @@ Arsitektur produksi:
 
 - **Aplikasi**: Vercel, region `sin1` (Singapura, `vercel.json`), deploy otomatis dari branch `main`.
 - **Database**: Supabase Postgres, project yang sama dengan Storage (region Singapura).
-- **File**: Supabase Storage (bucket `private-docs`, sudah dibuat dengan `pnpm storage:setup`).
+- **File**: Supabase Storage (bucket `private-docs` dan `payment-proofs`, dibuat dengan `pnpm storage:setup`).
 
 ## 1. Siapkan database Supabase
 
@@ -16,6 +16,8 @@ Arsitektur produksi:
 3. **Project Settings → Database → SSL Configuration → Download certificate**. Buka file `.crt` dengan text editor; seluruh isinya (dari `-----BEGIN CERTIFICATE-----` sampai `-----END CERTIFICATE-----`) menjadi `DATABASE_CA_CERT`. Dengan ini koneksi TLS diverifikasi penuh.
 
 Jangan menambahkan `sslmode=...` ke URL; pengaturan SSL diambil dari `DATABASE_CA_CERT` (`src/lib/db/pg-config.ts`).
+
+Jalankan `pnpm storage:setup` sekali dari laptop agar semua bucket ada, termasuk `payment-proofs` untuk bukti SPP. Tanpa bucket ini, unggah bukti akan gagal.
 
 ## 2. Buat secret Better Auth produksi
 
@@ -70,6 +72,8 @@ Password sementara tampil **sekali**. Login di alamat Vercel → wajib membuat p
 
 Setelah itu buat akun pelatih & atlet dari menu **Pengguna** (masing-masing mendapat password sementara).
 
+Setelah login, atur **tarif SPP** di menu **SPP** agar tagihan bulanan mulai berjalan. Bulan sebelum tarif pertama tidak ditagih.
+
 ## 5. Pemeriksaan setelah deploy
 
 - [ ] Log build Vercel berisi `prisma migrate deploy` dan `Data master: 19 nomor lomba`.
@@ -77,6 +81,7 @@ Setelah itu buat akun pelatih & atlet dari menu **Pengguna** (masing-masing mend
 - [ ] Login admin → ganti password → setup MFA → dashboard admin.
 - [ ] Buat event, unggah PDF (Supabase Storage), unduh PDF.
 - [ ] Buat akun atlet, login, daftar event, cek rekap & export Excel/PDF.
+- [ ] Atur tarif SPP, atlet kirim bukti, admin lihat bukti lalu setujui.
 - [ ] Header keamanan (`Content-Security-Policy`, `Strict-Transport-Security`) ada di respons (DevTools → Network).
 
 ## 6. Operasional

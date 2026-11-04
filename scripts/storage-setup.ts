@@ -13,6 +13,7 @@ import {
   PRIVATE_BUCKET,
   PUBLIC_BUCKET,
 } from "../src/lib/storage/pdf";
+import { PROOF_BUCKET, PROOF_MAX_BYTES, PROOF_MIME_TYPES } from "../src/lib/storage/payment-proof";
 
 config({ path: [".env.local", ".env"], quiet: true });
 
@@ -30,6 +31,13 @@ const BUCKETS: BucketSpec[] = [
     public: false,
     fileSizeLimit: PDF_MAX_BYTES,
     allowedMimeTypes: [PDF_MIME_TYPE],
+  },
+  // Bukti pembayaran SPP. Privat: hanya lewat signed URL.
+  {
+    id: PROOF_BUCKET,
+    public: false,
+    fileSizeLimit: PROOF_MAX_BYTES,
+    allowedMimeTypes: PROOF_MIME_TYPES,
   },
   // Foto publik (website, galeri) untuk fase berikutnya.
   {

@@ -13,6 +13,7 @@ import { AttendanceCountBadges } from "@/features/attendance/attendance-section"
 import { EvaluationCard, NoEvaluations } from "@/features/evaluations/evaluation-card";
 import { PersonalBestGrid } from "@/features/personal-bests/personal-best-card";
 import { RaceHistory } from "@/features/race-results/race-history";
+import { AthleteSppHistory } from "@/features/spp/athlete-spp-history";
 import { isAppError } from "@/lib/errors";
 import { requireActor } from "@/lib/permissions/actor";
 import { getAthleteDetail } from "@/services/athlete-service";
@@ -20,6 +21,7 @@ import { getAthleteAttendanceHistory } from "@/services/attendance-service";
 import { listEvaluations } from "@/services/evaluation-service";
 import { listPersonalBests } from "@/services/personal-best-service";
 import { listAthleteRaceHistory } from "@/services/race-result-service";
+import { getAthleteSppHistory } from "@/services/spp-service";
 
 export const metadata: Metadata = { title: "Detail Atlet Binaan" };
 
@@ -56,11 +58,12 @@ async function Content({ params }: { params: PageProps<"/coach/athletes/[id]">["
   const { id } = await params;
   // Cek izin lihat (atlet binaan) sebelum memuat data lain.
   const athlete = await loadAthlete(actor, id);
-  const [pbs, history, evaluations, attendance] = await Promise.all([
+  const [pbs, history, evaluations, attendance, spp] = await Promise.all([
     listPersonalBests(id),
     listAthleteRaceHistory(id),
     listEvaluations(actor, { athlete: id, page: 1 }),
     getAthleteAttendanceHistory(id, 0),
+    getAthleteSppHistory(actor, id),
   ]);
 
   return (
@@ -137,6 +140,14 @@ async function Content({ params }: { params: PageProps<"/coach/athletes/[id]">["
                 />
               ))
             )}
+          </section>
+          <section className="flex flex-col gap-3">
+            <h2 className="text-lg font-semibold">SPP</h2>
+            <AthleteSppHistory
+              history={spp}
+              limit={12}
+              emptyDescription="Tagihan muncul setelah admin mengatur tarif SPP."
+            />
           </section>
         </div>
       </div>

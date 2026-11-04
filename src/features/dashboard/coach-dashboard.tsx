@@ -8,6 +8,7 @@ import {
   eventDateRange,
   RegistrationWindowBadge,
 } from "@/features/competition-registrations/event-summary";
+import { SppOverviewCard } from "@/features/spp/spp-overview-card";
 import { formatDuration } from "@/lib/duration";
 import { isEvaluationDue } from "@/lib/evaluations";
 import { formatClubDate, formatTime, formatWeekdayDate } from "@/lib/format";
@@ -52,6 +53,8 @@ export async function CoachDashboard({ actor }: { actor: Actor }) {
           hint="> 30 hari / belum pernah"
         />
       </div>
+
+      <SppOverviewCard overview={data.spp} href="/coach/spp" />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <SectionCard

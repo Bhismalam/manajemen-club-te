@@ -18,6 +18,7 @@ export const RATE_LIMITS = {
   passwordReset: { max: 10, windowSeconds: 60 },
   evaluation: { max: 20, windowSeconds: 60 },
   download: { max: 30, windowSeconds: 60 },
+  payment: { max: 30, windowSeconds: 60 },
 } as const;
 
 export type RateLimitName = keyof typeof RATE_LIMITS;

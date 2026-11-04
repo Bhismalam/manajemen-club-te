@@ -6,6 +6,8 @@ import type {
   Medal,
   ResultStatus,
   Round,
+  SppPaymentMethod,
+  SppPaymentStatus,
   UserRole,
   UserStatus,
 } from "@/generated/prisma/enums";
@@ -34,6 +36,18 @@ export const ATTENDANCE_LABEL: Record<AttendanceStatus, string> = {
   PERMISSION: "Izin",
   SICK: "Sakit",
   ABSENT: "Tidak hadir",
+};
+
+export const SPP_STATUS_LABEL: Record<SppPaymentStatus, string> = {
+  PENDING: "Menunggu konfirmasi",
+  PAID: "Lunas",
+  REJECTED: "Ditolak",
+  CANCELLED: "Dibatalkan",
+};
+
+export const SPP_METHOD_LABEL: Record<SppPaymentMethod, string> = {
+  CASH: "Tunai",
+  TRANSFER: "Transfer",
 };
 
 export const COMPETITION_LEVEL_LABEL: Record<CompetitionLevel, string> = {
@@ -105,6 +119,12 @@ export const AUDIT_ACTION_LABEL: Record<string, string> = {
   "race_result.saved": "mencatat hasil lomba",
   "evaluation.created": "menulis evaluasi",
   "evaluation.updated": "mengubah evaluasi",
+  "spp_rate.set": "mengatur tarif SPP",
+  "spp_payment.recorded": "mencatat pembayaran SPP",
+  "spp_payment.submitted": "mengajukan bukti SPP",
+  "spp_payment.approved": "menyetujui pembayaran SPP",
+  "spp_payment.rejected": "menolak pembayaran SPP",
+  "spp_payment.cancelled": "membatalkan pembayaran SPP",
   "mfa.enabled": "mengaktifkan MFA",
   "mfa.disabled": "menonaktifkan MFA",
   "mfa.reset": "mereset MFA",

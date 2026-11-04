@@ -328,12 +328,42 @@ async function seedDemoData(people: Awaited<ReturnType<typeof seedPeople>>) {
 
 // ----------------------------------------------------------------------------
 
+// Tarif mulai 2 bulan lalu; satu atlet lunas bulan lalu agar halaman SPP punya isi.
+async function seedSppDemo() {
+  if ((await prisma.sppRate.count()) > 0) return;
+  const admin = await prisma.user.findUniqueOrThrow({ where: { email: "admin@club.local" } });
+  const monthsAgo = (count: number) => {
+    const now = new Date();
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - count, 1));
+  };
+  await prisma.sppRate.create({
+    data: { amount: 250_000, effectiveMonth: monthsAgo(2), createdById: admin.id },
+  });
+  const athlete = await prisma.athleteProfile.findFirstOrThrow({
+    where: { user: { email: "atlet1@club.local" } },
+  });
+  await prisma.sppPayment.create({
+    data: {
+      athleteId: athlete.id,
+      period: monthsAgo(1),
+      amount: 250_000,
+      status: "PAID",
+      method: "CASH",
+      paidOn: monthsAgo(1),
+      submittedById: admin.id,
+      reviewedById: admin.id,
+      reviewedAt: monthsAgo(1),
+    },
+  });
+}
+
 async function main() {
   const passwordHash = await hashPassword(seedPassword as string);
 
   await seedDisciplines(prisma);
   const people = await seedPeople(passwordHash);
   await seedDemoData(people);
+  await seedSppDemo();
 
   const counts = {
     users: await prisma.user.count(),

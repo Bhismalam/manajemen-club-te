@@ -14,6 +14,8 @@ import type { Actor } from "@/lib/permissions/types";
 import { getAdminDashboard } from "@/services/dashboard-service";
 import { countUnreadNotifications, listRecentNotifications } from "@/services/notification-service";
 
+import { SppOverviewCard } from "@/features/spp/spp-overview-card";
+
 import { AttendanceBar } from "./attendance-bar";
 
 // Ringkasan admin: angka utama, latihan & event terdekat, kehadiran 30 hari, notifikasi, aktivitas.
@@ -24,13 +26,13 @@ export async function AdminDashboard({ actor }: { actor: Actor }) {
     countUnreadNotifications(actor.userId),
     listRecentNotifications(actor.userId, 5),
   ]);
-  const { counts, sessions, events, attendance, activity } = data;
+  const { counts, sessions, events, attendance, activity, spp } = data;
 
   return (
     <>
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
-          label="Pendaftaran baru"
+          label="Notifikasi baru"
           value={unread}
           icon={Bell}
           href="#notifikasi"
@@ -52,6 +54,8 @@ export async function AdminDashboard({ actor }: { actor: Actor }) {
           hint="30 hari terakhir"
         />
       </div>
+
+      <SppOverviewCard overview={spp} href="/admin/spp" />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <SectionCard title="Latihan terdekat" href="/admin/training">

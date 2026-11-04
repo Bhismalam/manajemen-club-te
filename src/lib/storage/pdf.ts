@@ -25,13 +25,13 @@ export function isAttachmentKeyOf(key: string, competitionId: string): boolean {
 }
 
 // Nama file untuk ditampilkan & dipakai saat unduh: tanpa path dan karakter kontrol.
-export function sanitizeFileName(name: string): string {
+export function sanitizeFileName(name: string, fallback = "dokumen.pdf"): string {
   const base = name.split(/[\\/]/).pop() ?? "";
   const cleaned = base
     .replace(/[\u0000-\u001f\u007f"]/g, "")
     .trim()
     .slice(0, 150);
-  return cleaned || "dokumen.pdf";
+  return cleaned || fallback;
 }
 
 export type PdfCheck = { ok: true } | { ok: false; message: string };

@@ -9,7 +9,7 @@ import { MarkAllReadButton } from "./mark-all-read-button";
 
 type Notification = Awaited<ReturnType<typeof listRecentNotifications>>[number];
 
-// Notifikasi pendaftaran event terbaru untuk ringkasan admin. Yang belum dibaca ditandai titik.
+// Notifikasi terbaru (pendaftaran event, bukti SPP) untuk ringkasan admin. Yang belum dibaca ditandai titik.
 export function NotificationList({
   notifications,
   unread,
@@ -22,7 +22,7 @@ export function NotificationList({
       <div className="flex items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 font-semibold">
           <Bell className="size-4 text-muted-foreground" aria-hidden="true" />
-          Pendaftaran event
+          Notifikasi
           {unread > 0 && (
             <span className="numeric rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
               {unread} baru
@@ -32,7 +32,7 @@ export function NotificationList({
         {unread > 0 && <MarkAllReadButton />}
       </div>
       {notifications.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Belum ada aktivitas pendaftaran.</p>
+        <p className="text-sm text-muted-foreground">Belum ada notifikasi.</p>
       ) : (
         <ul className="flex flex-col divide-y">
           {notifications.map((n) => {

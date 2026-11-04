@@ -302,13 +302,22 @@ Panduan langkah demi langkah: `doc/DEPLOYMENT.md`.
 - [ ] Backup verification (Supabase Free tanpa backup otomatis: ekspor berkala / paket Pro).
 - [ ] Layanan email untuk lupa password (post-MVP; sementara password sementara dari admin).
 
+## PHASE 17b — SPP Atlet
+
+- [x] Tabel `spp_rate` & `spp_payment` (migration + CHECK).
+- [x] Tarif klub (admin), papan bulanan admin & pelatih, halaman atlet, riwayat di detail atlet, ringkasan dashboard.
+- [x] Catat lunas, ajukan bukti, setujui, tolak, batalkan (izin + audit + rate limit).
+- [x] Bukti di bucket privat `payment-proofs`: signed upload, cek isi file di server, lihat lewat signed URL.
+- [x] Unit, integration, dan E2E test.
+- [ ] Uji unggah bukti ke Supabase asli (butuh `pnpm storage:setup`; project Supabase sedang tidak bisa dihubungi).
+
 ## PHASE 18 — Post MVP
 
 - [ ] Notification lanjutan (push).
 - [ ] Email notifikasi pendaftaran event.
 - [ ] WhatsApp integration.
 - [ ] Email reminder.
-- [ ] Payments.
+- [ ] Pembayaran online (payment gateway).
 - [ ] PDF/Excel report lain (selain rekap pendaftar event).
 - [ ] Passkey (WebAuthn).
 - [ ] Parent account.

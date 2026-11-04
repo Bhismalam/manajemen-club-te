@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth/session";
 import { countUnreadNotifications } from "@/services/notification-service";
 
-// Ikon notifikasi admin di header, dengan jumlah pendaftaran event yang belum dibaca.
+// Ikon notifikasi admin di header, dengan jumlah notifikasi yang belum dibaca.
 // Membaca session: wajib di dalam <Suspense>.
 export async function NotificationBell() {
   const user = await getCurrentUser();

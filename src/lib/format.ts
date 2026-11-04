@@ -22,6 +22,16 @@ const dateTimeFormat = new Intl.DateTimeFormat(LOCALE, {
   timeZone: CLUB_TIME_ZONE,
 });
 
+const rupiahFormat = new Intl.NumberFormat(LOCALE, {
+  style: "currency",
+  currency: "IDR",
+  maximumFractionDigits: 0,
+});
+
+export function formatRupiah(amount: number): string {
+  return rupiahFormat.format(amount);
+}
+
 export function formatDate(value: Date | null | undefined): string {
   return value ? dateOnlyFormat.format(value) : "—";
 }

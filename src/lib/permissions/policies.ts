@@ -142,3 +142,19 @@ export function canViewRegistration(
 export function canExportRegistrations(actor: Actor): boolean {
   return isAdmin(actor);
 }
+
+// ---------------------------------------------------------------------------
+// SPP
+// ---------------------------------------------------------------------------
+
+export function canSetSppRate(actor: Actor): boolean {
+  return isAdmin(actor);
+}
+
+// Mencatat lunas, menyetujui, menolak, membatalkan. Atlet hanya bisa mengajukan bukti miliknya.
+export function canManageAthletePayment(
+  actor: Actor,
+  athlete: Pick<AthleteRef, "coachId">,
+): boolean {
+  return isAdmin(actor) || coachesAthlete(actor, athlete);
+}

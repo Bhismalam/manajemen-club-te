@@ -269,9 +269,22 @@ Atlet hanya dapat melihat evaluasi miliknya.
 
 Aplikasi dipakai khusus anggota satu klub, jadi tidak ada halaman publik. Alamat `/` langsung ke login / dashboard, dan aplikasi tidak diindeks mesin pencari. Implementasi website publik sempat dibuat (commit `fa7c380`) lalu dihapus; bisa dikembalikan dari riwayat Git bila diperlukan.
 
+### 4.14 SPP Atlet
+
+Pencatatan SPP bulanan: atlet mana yang sudah dan belum membayar. Pembayaran terjadi di luar aplikasi (tunai/transfer); aplikasi mencatat status, nominal, dan bukti.
+
+- Satu tarif untuk seluruh klub, diatur admin, berlaku mulai bulan tertentu. Nominal bisa diubah per atlet saat dicatat dan tidak ikut berubah saat tarif berubah.
+- Tagihan per bulan kalender (WITA), mulai dari yang lebih akhir antara bulan bergabung dan bulan tarif pertama. Hanya atlet aktif yang ditagih.
+- Admin (semua atlet) dan pelatih (atlet binaan) mencatat lunas dengan bukti opsional, menyetujui atau menolak pengajuan, dan membatalkan status lunas dengan alasan.
+- Atlet melihat status dan riwayat miliknya, serta mengunggah bukti (foto/PDF, maks. 10 MB) sehingga statusnya Menunggu konfirmasi. Status Lunas tidak bisa ditimpa atlet.
+- Menunggak = bulan yang sudah lewat tanpa status Lunas/Menunggu. Bulan berjalan belum dihitung menunggak. Tidak ada denda.
+- Pengajuan baru memberi notifikasi ke admin.
+
+Di luar scope: payment gateway, cicilan, satu pembayaran untuk banyak bulan, kuitansi, export, pengingat otomatis.
+
 ## 5. Non-MVP / Phase 2
 
-- Pembayaran membership.
+- Pembayaran online (payment gateway).
 - Reminder WhatsApp/email.
 - Push notification.
 - Ranking internal.
