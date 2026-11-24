@@ -84,7 +84,24 @@ Setelah login, atur **tarif SPP** di menu **SPP** agar tagihan bulanan mulai ber
 - [ ] Atur tarif SPP, atlet kirim bukti, admin lihat bukti lalu setujui.
 - [ ] Header keamanan (`Content-Security-Policy`, `Strict-Transport-Security`) ada di respons (DevTools → Network).
 
-## 6. Operasional
+## 6. Verifikasi PWA TE sebelum rilis
+
+PWA memakai manifest bawaan Next.js, tanpa tambahan layanan atau environment variable. Pastikan URL produksi memakai HTTPS dan `BETTER_AUTH_URL` sesuai origin aplikasi.
+
+Verifikasi lokal 21 November 2026 pada Next.js 16.4.6: `pnpm check` (188 unit test), production build, dan regresi E2E PWA (17/17 tes, termasuk setup akun) berhasil. Pemeriksaan advisori npm bawaan Next.js melaporkan `affected: false`. Checklist perangkat/HTTPS berikut tetap belum selesai dan harus dilakukan pada deployment yang akan dirilis.
+
+- [ ] Buka `/manifest.webmanifest` tanpa login: nama `TE`, mode `standalone`, URL awal `/dashboard`, dan ikon dapat dimuat tanpa redirect ke login.
+- [ ] Android Chrome: buka aplikasi lewat browser, login, pilih menu akun → **Pasang TE**, lalu pasang melalui browser. Jika tombol pemasangan belum tersedia, gunakan petunjuk menu browser.
+- [ ] iPhone Safari: buka menu akun → **Pasang TE**, lalu Bagikan → Tambahkan ke Layar Utama. Jika tersedia, aktifkan **Buka sebagai App**.
+- [ ] Buka ikon TE dari home screen: nama/ikon benar, tampilan standalone, dashboard sesuai peran jika sesi valid, login jika sesi berakhir. Kewajiban ganti password dan MFA admin tetap berlaku.
+- [ ] Menu **Pasang TE** tidak muncul saat dibuka dalam mode standalone.
+- [ ] Periksa portrait/landscape, notch, indikator gestur, keyboard saat mengisi formulir, dan pinch zoom. Header, drawer, tombol simpan, navigasi bawah, serta dialog tetap terjangkau.
+- [ ] Saat halaman terbuka, matikan koneksi: pesan **Koneksi terputus** muncul. Nyalakan kembali: pesan hilang dan isian tetap ada. Status browser hanya petunjuk; hasil permintaan server menentukan keberhasilan penyimpanan.
+- [ ] Pada akun/data uji, putuskan respons penyimpanan absensi/time trial: loading berhenti dan pesan hasil belum pasti muncul. Periksa data di tab lain sebelum mengirim ulang; tidak ada pengiriman ulang otomatis.
+
+Tanpa internet, pembukaan dari kondisi aplikasi tertutup mengikuti penanganan browser. Versi ini tidak menyediakan akses data offline, penyimpanan isian setelah reload, sinkronisasi, atau push notification. Jangan menganggap respons yang hilang berarti data pasti belum tersimpan.
+
+## 7. Operasional
 
 - **Log & error**: Vercel → project → **Logs** (runtime). Error di halaman menampilkan kode referensi (digest) yang bisa dicari di log.
 - **Supabase free tier**: project dijeda otomatis jika tidak ada aktivitas sekitar 1 minggu; buka dashboard Supabase untuk mengaktifkan lagi. Pertimbangkan paket Pro bila aplikasi dipakai rutin (juga memberi backup harian).

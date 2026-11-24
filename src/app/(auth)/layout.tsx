@@ -1,8 +1,17 @@
+import { BrandMark } from "@/components/dashboard/brand-mark";
+import { ConnectionStatus } from "@/components/shared/connection-status";
+
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-6 px-4 py-10">
-      <p className="text-lg font-semibold tracking-tight">Swim &amp; Finswimming Club</p>
-      <div className="w-full max-w-sm">{children}</div>
+    <main className="safe-area-page flex flex-1 flex-col items-center justify-center gap-6">
+      <p className="flex items-center gap-3 text-lg font-semibold tracking-tight">
+        <BrandMark className="size-10 shrink-0 text-primary" />
+        TE
+      </p>
+      <div className="flex w-full max-w-sm flex-col gap-4">
+        <ConnectionStatus />
+        {children}
+      </div>
     </main>
   );
 }

@@ -1,8 +1,12 @@
 "use client";
 
-import { ChevronsUpDown, LogOut, ShieldCheck } from "lucide-react";
+import { ChevronsUpDown, Download, LogOut, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+
+import { InstallAppDialog } from "@/components/shared/install-app-dialog";
+import { useInstallApp } from "@/components/shared/install-app-provider";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -36,6 +40,9 @@ export function UserMenuDropdown({
   roleLabel: string;
 }) {
   const router = useRouter();
+  const { platform, installed } = useInstallApp();
+  const [installOpen, setInstallOpen] = useState(false);
+  const accountTrigger = useRef<HTMLButtonElement>(null);
 
   async function signOut() {
     await authClient.signOut();
@@ -44,39 +51,53 @@ export function UserMenuDropdown({
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className="flex items-center gap-2 rounded-lg p-1 pr-2 text-left outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label={`Menu akun ${name}`}
-      >
-        <Avatar className="size-8">
-          <AvatarFallback className="bg-secondary text-xs font-semibold text-secondary-foreground">
-            {initials(name)}
-          </AvatarFallback>
-        </Avatar>
-        <span className="hidden flex-col leading-tight sm:flex">
-          <span className="max-w-40 truncate text-sm font-medium">{name}</span>
-          <span className="text-xs text-muted-foreground">{roleLabel}</span>
-        </span>
-        <ChevronsUpDown className="hidden size-4 text-muted-foreground sm:block" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-60">
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className="flex flex-col">
-            <span className="truncate font-medium text-foreground">{name}</span>
-            <span className="truncate text-xs font-normal">{email}</span>
-          </DropdownMenuLabel>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem render={<Link href={SECURITY_SETTINGS_PATH} />}>
-          <ShieldCheck />
-          Keamanan akun
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={signOut}>
-          <LogOut />
-          Keluar
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          ref={accountTrigger}
+          className="flex items-center gap-2 rounded-lg p-1 pr-2 text-left outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={`Menu akun ${name}`}
+        >
+          <Avatar className="size-8">
+            <AvatarFallback className="bg-secondary text-xs font-semibold text-secondary-foreground">
+              {initials(name)}
+            </AvatarFallback>
+          </Avatar>
+          <span className="hidden flex-col leading-tight sm:flex">
+            <span className="max-w-40 truncate text-sm font-medium">{name}</span>
+            <span className="text-xs text-muted-foreground">{roleLabel}</span>
+          </span>
+          <ChevronsUpDown className="hidden size-4 text-muted-foreground sm:block" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-60">
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="flex flex-col">
+              <span className="truncate font-medium text-foreground">{name}</span>
+              <span className="truncate text-xs font-normal">{email}</span>
+            </DropdownMenuLabel>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem render={<Link href={SECURITY_SETTINGS_PATH} />}>
+            <ShieldCheck />
+            Keamanan akun
+          </DropdownMenuItem>
+          {platform !== null && platform !== "standalone" && !installed && (
+            <DropdownMenuItem onClick={() => setInstallOpen(true)}>
+              <Download />
+              Pasang TE
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem onClick={signOut}>
+            <LogOut />
+            Keluar
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <InstallAppDialog
+        open={installOpen}
+        onOpenChange={setInstallOpen}
+        returnFocus={accountTrigger}
+      />
+    </>
   );
 }

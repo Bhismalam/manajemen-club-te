@@ -1,9 +1,13 @@
-// Marka "T" di ujung lintasan dasar kolam: tanda klub, juga dipakai sebagai indikator item aktif.
+// Monogram TE mengikuti aset ikon aplikasi; penanda navigasi tetap memakai marka lintasan.
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className={className}>
-      <rect x="10.5" y="5" width="3" height="16" rx="1.5" fill="currentColor" />
-      <rect x="5" y="3" width="14" height="3" rx="1.5" fill="currentColor" />
+    <svg viewBox="0 0 512 512" aria-hidden="true" className={className}>
+      <path fill="currentColor" d="M0 0h512v512H0z" />
+      <path
+        className="text-primary-foreground"
+        fill="currentColor"
+        d="M112 164h128v32h-48v152h-32V196h-48zM272 164h128v32h-96v44h80v32h-80v44h96v32H272z"
+      />
     </svg>
   );
 }

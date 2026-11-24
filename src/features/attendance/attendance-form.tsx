@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ATTENDANCE_LABEL } from "@/constants/labels";
@@ -34,6 +35,7 @@ export function AttendanceForm({ sessionId, rows }: { sessionId: string; rows: R
   ) as Record<string, Entry>;
   const [entries, setEntries] = useState<Record<string, Entry>>(initial);
   const [saving, setSaving] = useState(false);
+  const [saveUncertain, setSaveUncertain] = useState(false);
 
   const marked = Object.values(entries).filter((entry) => entry.status !== null).length;
   const dirty = rows.some(
@@ -50,17 +52,24 @@ export function AttendanceForm({ sessionId, rows }: { sessionId: string; rows: R
   }
 
   async function save() {
+    if (saving) return;
     setSaving(true);
     const payload = Object.entries(entries)
       .filter(([, entry]) => entry.status !== null)
       .map(([athleteId, entry]) => ({ athleteId, status: entry.status, note: entry.note }));
-    const result = await saveAttendanceAction({ sessionId, entries: payload });
-    setSaving(false);
-    if (!result.success) {
-      toast.error(result.error.message);
-      return;
+    try {
+      const result = await saveAttendanceAction({ sessionId, entries: payload });
+      if (!result.success) {
+        toast.error(result.error.message);
+        return;
+      }
+      setSaveUncertain(false);
+      toast.success(result.message ?? "Tersimpan.");
+    } catch {
+      setSaveUncertain(true);
+    } finally {
+      setSaving(false);
     }
-    toast.success(result.message ?? "Tersimpan.");
   }
 
   return (
@@ -140,7 +149,17 @@ export function AttendanceForm({ sessionId, rows }: { sessionId: string; rows: R
         })}
       </ul>
 
-      <div className="flex items-center gap-3">
+      {saveUncertain && (
+        <Alert>
+          <AlertTitle>Hasil penyimpanan belum dapat dipastikan</AlertTitle>
+          <AlertDescription>
+            Respons penyimpanan tidak diterima. Isian tetap ada di halaman ini. Periksa absensi di
+            tab lain sebelum mencoba menyimpan ulang.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <div className="flex flex-wrap items-center gap-3">
         <Button type="button" onClick={save} disabled={!dirty || marked === 0 || saving}>
           {saving ? "Menyimpan…" : "Simpan absensi"}
         </Button>

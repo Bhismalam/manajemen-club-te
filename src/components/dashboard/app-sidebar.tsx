@@ -31,10 +31,10 @@ export function AppSidebar({ role }: { role: UserRole }) {
           href={nav.home}
           className="flex items-center gap-2.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
         >
-          <BrandMark className="size-6 text-lane" />
+          <BrandMark className="size-8 shrink-0 text-primary" />
           <span className="flex flex-col leading-tight">
             <span className="font-heading text-sm font-bold text-sidebar-accent-foreground">
-              Swim &amp; Finswimming
+              TE
             </span>
             <span className="text-xs text-sidebar-foreground/70">Club · {nav.label}</span>
           </span>

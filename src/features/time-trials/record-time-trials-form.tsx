@@ -8,6 +8,7 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 import { StatusBadge } from "@/components/shared/status-badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ export function RecordTimeTrialsForm({
   basePath: string;
 }) {
   const [results, setResults] = useState<RecordedResult[] | null>(null);
+  const [saveUncertain, setSaveUncertain] = useState(false);
   const {
     register,
     control,
@@ -121,13 +123,18 @@ export function RecordTimeTrialsForm({
       noValidate
       className="max-w-3xl"
       onSubmit={handleSubmit(async (values) => {
-        const result = await recordTimeTrialsAction(values);
-        if (!result.success) {
-          toast.error(result.error.message);
-          return;
+        try {
+          const result = await recordTimeTrialsAction(values);
+          if (!result.success) {
+            toast.error(result.error.message);
+            return;
+          }
+          setSaveUncertain(false);
+          toast.success(result.message ?? "Tersimpan.");
+          setResults(result.data);
+        } catch {
+          setSaveUncertain(true);
         }
-        toast.success(result.message ?? "Tersimpan.");
-        setResults(result.data);
       })}
     >
       <FieldGroup>
@@ -278,6 +285,19 @@ export function RecordTimeTrialsForm({
             Tambah atlet
           </Button>
         </fieldset>
+
+        {saveUncertain && (
+          <Alert>
+            <AlertTitle>Hasil penyimpanan belum dapat dipastikan</AlertTitle>
+            <AlertDescription>
+              Respons penyimpanan tidak diterima. Isian tetap ada di halaman ini. Periksa hasil di{" "}
+              <a href={basePath} target="_blank" rel="noopener noreferrer">
+                daftar time trial (tab baru)
+              </a>{" "}
+              sebelum mencoba menyimpan ulang agar tidak tercatat dua kali.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Button type="submit" className="self-start" disabled={isSubmitting}>
           {isSubmitting ? "Menyimpan…" : "Simpan time trial"}

@@ -309,7 +309,24 @@ Panduan langkah demi langkah: `doc/DEPLOYMENT.md`.
 - [x] Catat lunas, ajukan bukti, setujui, tolak, batalkan (izin + audit + rate limit).
 - [x] Bukti di bucket privat `payment-proofs`: signed upload, cek isi file di server, lihat lewat signed URL.
 - [x] Unit, integration, dan E2E test.
-- [ ] Uji unggah bukti ke Supabase asli (butuh `pnpm storage:setup`; project Supabase sedang tidak bisa dihubungi).
+- [x] Verifikasi Storage Supabase asli (5 Nov 2026): bucket privat `payment-proofs` tersedia; upload PNG/PDF lewat signed URL tanpa API key, preflight CORS, baca server/signed URL, penolakan akses publik/overwrite/SVG, serta pembersihan objek uji. Dapat diulang dengan `pnpm storage:verify`.
+- [ ] Uji alur unggah bukti → persetujuan lewat browser dengan Supabase asli. Verifikasi Storage langsung sudah lolos; integration/E2E belum dijalankan ulang pada 5 Nov 2026 karena izin akses PostgreSQL di luar sandbox ditolak.
+
+## PHASE 17c — PWA TE (online)
+
+- [x] Manifest Next.js: nama TE, scope `/`, start URL `/dashboard`, mode standalone.
+- [x] Ikon monogram TE 192/512px, maskable, Apple touch icon, favicon; identitas login/sidebar dan metadata TE.
+- [x] Menu akun **Pasang TE** untuk semua role, petunjuk iPhone/browser lain, event pemasangan, serta penyembunyian dalam mode standalone.
+- [x] Viewport tanpa pembatasan zoom dan safe area pada header, konten, drawer, navigasi bawah, serta dialog.
+- [x] Pemberitahuan koneksi terputus pada dashboard, autentikasi, dan pengaturan; tanpa pengiriman ulang otomatis.
+- [x] Absensi/time trial: kegagalan respons melepas loading, mempertahankan isian, dan meminta pemeriksaan hasil sebelum mencoba ulang.
+- [x] Tambahkan unit test aset dan regresi Playwright PWA; dokumentasikan batas offline serta verifikasi HTTPS/perangkat.
+- [x] Perbaiki encoding favicon ICO menjadi RGBA tanpa mengubah warna piksel, tambahkan tes regresi; `pnpm check` (188 unit test) dan build langsung berhasil pada 21 November 2026.
+- [x] Perbarui `next` dan `eslint-config-next` ke 16.4.6 beserta lockfile; pemeriksaan advisori npm bawaan Next.js melaporkan `affected: false` pada 21 November 2026.
+- [x] Regresi E2E PWA terhadap production build dan database `*_test` lolos 17/17 tes (satu setup akun + 16 skenario desktop/mobile) pada 21 November 2026. Build dan `pnpm check` (188 unit test) juga berhasil.
+- [ ] Verifikasi pemasangan nyata Android Chrome dan iPhone Safari melalui HTTPS, termasuk keyboard/notch dan autentikasi.
+
+Tidak termasuk service worker, cache offline, push notification, atau sinkronisasi. Isian belum tersimpan tidak dijamin bertahan setelah reload atau aplikasi ditutup.
 
 ## PHASE 18 — Post MVP
 
