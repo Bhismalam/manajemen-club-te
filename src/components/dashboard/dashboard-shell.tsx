@@ -4,6 +4,7 @@ import { ConnectionStatus } from "@/components/shared/connection-status";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import type { UserRole } from "@/generated/prisma/enums";
+import { LogoutButton } from "@/features/auth/logout-button";
 import { cn } from "@/lib/utils";
 
 import { AppSidebar } from "./app-sidebar";
@@ -36,6 +37,7 @@ export function DashboardShell({ role, children }: { role: UserRole; children: R
             <Suspense fallback={<UserMenuSkeleton />}>
               <UserMenu />
             </Suspense>
+            <LogoutButton />
           </div>
         </header>
         <div

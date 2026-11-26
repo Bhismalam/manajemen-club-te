@@ -26,7 +26,7 @@ test.describe("login & password", () => {
     await expect(page.getByRole("heading", { name: /Halo,/ })).toBeVisible();
   });
 
-  test("logout mencabut session", async ({ browser, baseURL }) => {
+  test("tombol Keluar di header mencabut session", async ({ browser, baseURL }) => {
     const api = await request.newContext({ baseURL, extraHTTPHeaders: clientHeaders(baseURL!) });
     await api.post("/api/auth/sign-in/email", {
       data: { email: USERS.coach, password: SEED_PASSWORD },
@@ -35,10 +35,12 @@ test.describe("login & password", () => {
     const page = await context.newPage();
     await page.goto("/coach");
     await expect(page.getByRole("heading", { name: /Halo,/ })).toBeVisible();
-    await api.post("/api/auth/sign-out", { data: {} });
+    await page.locator("header").getByRole("button", { name: "Keluar", exact: true }).click();
+    await expect(page).toHaveURL(/\/login/);
     await page.goto("/coach");
     await expect(page).toHaveURL(/\/login/);
     await context.close();
+    await api.dispose();
   });
 
   test("akun baru wajib mengganti password awal dari admin", async ({ browser }) => {

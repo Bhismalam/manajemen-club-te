@@ -1,7 +1,9 @@
 "use client";
 
+import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth/auth-client";
@@ -13,13 +15,31 @@ export function LogoutButton() {
 
   async function handleLogout() {
     setPending(true);
-    await authClient.signOut();
-    router.replace(LOGIN_PATH);
-    router.refresh();
+    try {
+      const { error } = await authClient.signOut();
+      if (error) {
+        toast.error("Gagal keluar. Silakan coba lagi.");
+        return;
+      }
+      router.replace(LOGIN_PATH);
+      router.refresh();
+    } catch {
+      toast.error("Gagal keluar. Periksa koneksi lalu coba lagi.");
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
-    <Button variant="outline" onClick={handleLogout} disabled={pending}>
+    <Button
+      type="button"
+      variant="outline"
+      className="min-h-11"
+      onClick={handleLogout}
+      disabled={pending}
+      aria-busy={pending}
+    >
+      <LogOut aria-hidden="true" />
       {pending ? "Keluar…" : "Keluar"}
     </Button>
   );
